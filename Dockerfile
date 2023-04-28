@@ -4,6 +4,8 @@ RUN useradd -ms /bin/bash python
 
 USER python
 
-WORKDIR /home/python/app
+WORKDIR /home/python/app/src
+
+ENV PYTHONPATH=${PYTHONPATH}/home/python/app
 
 CMD [ "tail", "-f", "/dev/null" ]
