@@ -28,7 +28,8 @@
 			"extensions": [
 				"sourcery.sourcery",
 				"eamodio.gitlens",
-				"donjayamanne.githistory"
+				"donjayamanne.githistory",
+				"vivaxy.vscode-conventional-commits"
 			]
 		}
 	},
