@@ -28,6 +28,7 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
     -p https://github.com/zsh-users/zsh-completions \
     -a 'export TERM=xterm-256color'
 
-RUN echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> ~/.zshrc
+RUN echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> ~/.zshrc && \
+    echo 'HISTFILE=/home/python/zsh/.zsh_history' >> ~/.zshrc
 
 CMD [ "tail", "-f", "/dev/null" ]
