@@ -29,8 +29,12 @@
 				"sourcery.sourcery",
 				"eamodio.gitlens",
 				"donjayamanne.githistory",
-				"vivaxy.vscode-conventional-commits"
-			]
+				"vivaxy.vscode-conventional-commits",
+				"ms-azuretools.vscode-docker"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh"
+			}
 		}
 	},
 
