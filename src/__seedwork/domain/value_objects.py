@@ -18,3 +18,6 @@ class UniqueEntityId:
             uuid.UUID(self.id)
         except ValueError as ex:
             raise InvalidUuidException() from ex
+        
+    def __str__(self) -> str:
+        return self.id

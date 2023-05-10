@@ -1,4 +1,4 @@
-FROM  python:3.10.2-slim
+FROM  python:3.11-slim
 
 RUN apt update && apt install -y --no-install-recommends \
                     default-jre \
@@ -14,7 +14,7 @@ USER python
 
 WORKDIR /home/python/app/src
 
-ENV PYTHONPATH=${PYTHONPATH}/home/python/app
+ENV PYTHONPATH=${PYTHONPATH}/home/python/app/src
 ENV JAVA_HOME=/usr/lib/jvw/java-11-openjdk-amd64
 
 
