@@ -27,6 +27,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"donjayamanne.python-extension-pack",
 				"sourcery.sourcery",
 				"eamodio.gitlens",
 				"donjayamanne.githistory",
