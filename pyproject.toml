@@ -1,0 +1,13 @@
+
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "moliveira", email = "moliveira@pinterest.com"},
+]
+dependencies = [
+    "autopep8>=2.0.2",
+]
+requires-python = ">=3.11"
+license = {text = "MIT"}
