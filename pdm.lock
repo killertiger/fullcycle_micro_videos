@@ -19,8 +19,8 @@ summary = "Python style guide checker"
 [metadata]
 lock_version = "4.2"
 cross_platform = true
-groups = ["default"]
-content_hash = "sha256:ca09077ef6d8124cb75df0d8d3b3005f70eb1231ed6f55b673d4bf0505fea08b"
+groups = ["default", "dev"]
+content_hash = "sha256:4e5967cfd0a29f60640bccd4a7b0a211f9f502e63c733af0895a662553d0701c"
 
 [metadata.files]
 "autopep8 2.0.2" = [
