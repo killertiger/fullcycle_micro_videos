@@ -3,7 +3,7 @@ from dataclasses import dataclass, field, asdict
 from __seedwork.domain.value_objects import UniqueEntityId
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Entity(ABC):
     unique_entity_id: UniqueEntityId = field(
         default_factory=lambda: UniqueEntityId())

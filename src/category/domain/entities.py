@@ -5,7 +5,7 @@ from typing import Optional
 from __seedwork.domain.entities import Entity
 
 
-@dataclass(kw_only=True, frozen=True)
+@dataclass(kw_only=True, frozen=True, slots=True)
 class Category(Entity):
     name: str
     description: Optional[str] = None
