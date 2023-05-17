@@ -45,3 +45,10 @@ class TestEntityUnit(unittest.TestCase):
             'prop1': 'value1',
             'prop2': 'value2'
         })
+        
+    def test_set_method(self):
+        entity = StubEntity(prop1='value 1', prop2='value 2')
+        
+        entity._set('prop1', 'new value 1')
+        
+        self.assertEqual(entity.prop1, 'new value 1')

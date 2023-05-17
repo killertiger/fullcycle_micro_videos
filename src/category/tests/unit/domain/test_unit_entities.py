@@ -41,22 +41,23 @@ class TestCategoryUnit(unittest.TestCase):
 
     def test_activate(self):
         category = Category(name='Movie 1', is_active=False)
-        assert category.is_active == False
-        
+
         category.activate()
-        assert category.is_active == True
+
+        self.assertTrue(category.is_active)
     
     def test_deactivate(self):
         category = Category(name='Movie 1', is_active=True)
-        assert category.is_active == True
         
         category.deactivate()
-        assert category.is_active == False
+
+        self.assertFalse(category.is_active)
         
     def test_update(self):
         category = Category(name='Movie 1', description='My description')
+
         category.update(name='Name 2', description='My new description')
         
-        assert category.name == 'Name 2'
-        assert category.description == 'My new description'
+        self.assertEqual(category.name, 'Name 2')
+        self.assertEqual(category.description, 'My new description')
         
