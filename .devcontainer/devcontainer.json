@@ -35,7 +35,8 @@
 				"vivaxy.vscode-conventional-commits",
 				"ms-azuretools.vscode-docker",
 				"bungcip.better-toml",
-				"johnpapa.vscode-peacock"
+				"johnpapa.vscode-peacock",
+				"ms-azuretools.vscode-docker"
 			],
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "zsh"
