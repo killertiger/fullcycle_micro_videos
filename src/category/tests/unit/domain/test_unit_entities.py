@@ -38,3 +38,25 @@ class TestCategoryUnit(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             object_value = Category(name='Movie 1')
             object_value.name = 'fake name'
+
+    def test_activate(self):
+        category = Category(name='Movie 1', is_active=False)
+        assert category.is_active == False
+        
+        category.activate()
+        assert category.is_active == True
+    
+    def test_deactivate(self):
+        category = Category(name='Movie 1', is_active=True)
+        assert category.is_active == True
+        
+        category.deactivate()
+        assert category.is_active == False
+        
+    def test_update(self):
+        category = Category(name='Movie 1', description='My description')
+        category.update(name='Name 2', description='My new description')
+        
+        assert category.name == 'Name 2'
+        assert category.description == 'My new description'
+        
