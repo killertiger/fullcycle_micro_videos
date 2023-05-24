@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any, Dict, List, Generic
 from dataclasses import dataclass
+from abc import ABC
 
 from .exceptions import ValidationException
 
@@ -32,4 +33,16 @@ class ValidatorRules:
         if self.value is not None and self.value is not True and self.value is not False:
             raise ValidationException(f'The {self.prop} must be a boolean')
         return self
-    
+
+ErrorFields = Dict[str, List[str]]
+
+PropsValidated = TypeVar('PropsValidated')
+
+@dataclass(slot=True)
+class ValidatorFieldsInterface(ABC, Generic[PropsValidated]):
+    errors: ErrorFields
+    validated_data: PropsValidated
+
+    @abc.abstractmethod
+    def validate(self, data: Any) -> bool:
+        raise NotImplementedError()
