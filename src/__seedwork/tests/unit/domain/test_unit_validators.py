@@ -1,6 +1,7 @@
 import unittest
+from dataclasses import fields
 
-from __seedwork.domain.validators import ValidatorRules, ValidationException
+from __seedwork.domain.validators import ValidatorRules, ValidationException, ValidatorFieldsInterface
 
 
 class TestValidatorRules(unittest.TestCase):
@@ -153,10 +154,10 @@ class TestValidatorRules(unittest.TestCase):
             'The prop is required',
             assert_error.exception.args[0]
         )
-        
+
         with self.assertRaises(ValidationException) as assert_error:
             ValidatorRules.values(5, 'prop').required().boolean()
-            
+
         self.assertEqual(
             'The prop must be a boolean',
             assert_error.exception.args[0]
@@ -165,8 +166,26 @@ class TestValidatorRules(unittest.TestCase):
     def test_valid_cases_for_combination_between_rules(self):
         ValidatorRules('test', 'prop').required().string()
         ValidatorRules('t' * 5, 'prop').required().string().max_length(5)
-        
+
         ValidatorRules(True, 'prop').required().boolean()
         ValidatorRules(False, 'prop').required().boolean()
-        
+
         self.assertTrue(True)
+
+
+class TestValidatorFieldsInterface(unittest.TestCase):
+    def test_throw_error_when_validate_method_not_implemented(self):
+        with self.assertRaises(TypeError) as assert_error:
+            ValidatorFieldsInterface()
+        self.assertEqual("Can't instantiate abstract class ValidatorFieldsInterface with abstract method validate",
+                         assert_error.exception.args[0])
+        
+    def test_qualquer(self):
+        fields_class = fields(ValidatorFieldsInterface)
+        errors_field = fields_class[0]
+        self.assertEqual(errors_field.name, 'errors')
+        self.assertIsNone(errors_field.default)
+        
+        validated_data_field = fields_class[1]
+        self.assertEqual(validated_data_field.name, 'validated_data')
+        self.assertIsNone(validated_data_field.default)
