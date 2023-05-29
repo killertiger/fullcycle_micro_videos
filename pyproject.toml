@@ -7,6 +7,7 @@ authors = [
     {name = "moliveira", email = "moliveira@pinterest.com"},
 ]
 dependencies = [
+    "djangorestframework>=3.14.0",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
