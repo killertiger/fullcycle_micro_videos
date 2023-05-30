@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Dict
 from rest_framework import serializers
 
 from __seedwork.domain.validators import DRFValidator, StrictCharField, StrictBooleanField
@@ -11,8 +11,8 @@ class CategoryRules(serializers.Serializer):
     
 
 class CategoryValidator(DRFValidator):
-    def validate(self, data: Any):
-        rules = CategoryRules(data=data)
+    def validate(self, data: Dict):
+        rules = CategoryRules(data=data if data is not None else {})
         return super().validate(rules)
     
     
