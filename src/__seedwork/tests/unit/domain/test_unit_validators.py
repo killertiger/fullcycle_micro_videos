@@ -221,3 +221,4 @@ class TestDRFValidatorUnit(unittest.TestCase):
         self.assertFalse(is_valid)
         self.assertEqual(validator.errors, {'field': ['some error']})
         mock_is_valid.assert_called_once()
+        
