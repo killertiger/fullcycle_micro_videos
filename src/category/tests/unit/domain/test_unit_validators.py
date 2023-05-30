@@ -59,3 +59,16 @@ class TestCategoryValidatorUnit(unittest.TestCase):
                              ['Datetime has wrong format. Use one of these formats instead: '
                               'YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].'])
         
+    def test_validate_cases(self):
+        valid_data = [
+            {'name': 'Movie'},
+            {'name': 'Movie', 'description': None},
+            {'name': 'Movie', 'description': 'some description'},
+            {'name': 'Movie', 'is_active': True},
+            {'name': 'Movie', 'is_active': False},
+            {'name': 'Movie', 'description': 'some description', 'is_active': True},
+        ]
+        
+        for i in valid_data:
+            is_valid = self.validator.validate(i)
+            self.assertTrue(is_valid)
