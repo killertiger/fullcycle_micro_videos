@@ -10,30 +10,26 @@ class TestCategoryValidatorUnit(unittest.TestCase):
         return super().setUp()
     
     def test_invalidation_cases_for_name_field(self):
-        is_valid = self.validator.validate(None)
-        self.assertFalse(is_valid)
-        self.assertListEqual(self.validator.errors['name'], ['This field is required.'])
         
-        is_valid = self.validator.validate({})
-        self.assertFalse(is_valid)
-        self.assertListEqual(self.validator.errors['name'], ['This field is required.'])
+        invalid_data = [
+            {'data': None, 'expected': 'This field is required.'},
+            {'data': {}, 'expected': 'This field is required.'},
+            {'data': {'name': None}, 'expected': 'This field may not be null.'},
+            {'data': {'name': ''}, 'expected': 'This field may not be blank.'},
+            {'data': {'name': 5}, 'expected': 'Not a valid string.'},
+            {'data': {'name': 'a'*256}, 'expected': 'Ensure this field has no more than 255 characters.'},
+        ]
         
-        is_valid = self.validator.validate({'name': ''})
-        self.assertFalse(is_valid)
-        self.assertListEqual(self.validator.errors['name'], ['This field may not be blank.'])
-        
-        is_valid = self.validator.validate({'name': None})
-        self.assertFalse(is_valid)
-        self.assertListEqual(self.validator.errors['name'], ['This field may not be null.'])
-        
-        is_valid = self.validator.validate({'name': 5})
-        self.assertFalse(is_valid)
-        self.assertListEqual(self.validator.errors['name'], ['Not a valid string.'])
-        
-        is_valid = self.validator.validate({'name': 'a'*256})
-        self.assertFalse(is_valid)
-        self.assertListEqual(self.validator.errors['name'], ['Ensure this field has no more than 255 characters.'])
-        
+        for i in invalid_data:
+            is_valid = self.validator.validate(i['data'])
+            self.assertFalse(is_valid)
+            self.assertIn('name', self.validator.errors)
+            self.assertListEqual(
+                self.validator.errors['name'],
+                [i['expected']],
+                 f'Expected: {i["expected"]}, actual: {self.validator.errors["name"][0]}'
+            )
+            
     def test_invalidation_cases_for_description_field(self):
         is_valid = self.validator.validate({'description': 5})
         self.assertFalse(is_valid)
