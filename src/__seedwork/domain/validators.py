@@ -2,9 +2,12 @@ from typing import Any, Dict, List, Generic, TypeVar
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from rest_framework.serializers import Serializer
+from django.conf import settings
 
 from .exceptions import ValidationException
 
+if not settings.configured:
+    settings.configure(USE_I18N=False)
 
 @dataclass(frozen=True, slots=True)
 class ValidatorRules:
