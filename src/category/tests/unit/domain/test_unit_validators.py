@@ -33,3 +33,33 @@ class TestCategoryValidatorUnit(unittest.TestCase):
         is_valid = self.validator.validate({'name': 'a'*256})
         self.assertFalse(is_valid)
         self.assertListEqual(self.validator.errors['name'], ['Ensure this field has no more than 255 characters.'])
+        
+    def test_invalidation_cases_for_description_field(self):
+        is_valid = self.validator.validate({'description': 5})
+        self.assertFalse(is_valid)
+        self.assertListEqual(self.validator.errors['description'], ['Not a valid string.'])
+        
+    def test_invalidation_cases_for_is_active_field(self):
+        is_valid = self.validator.validate({'is_active': None})
+        self.assertFalse(is_valid)
+        self.assertListEqual(self.validator.errors['is_active'], ['This field may not be null.'])
+        
+        is_valid = self.validator.validate({'is_active': 0})
+        self.assertFalse(is_valid)
+        self.assertListEqual(self.validator.errors['is_active'], ['Must be a valid boolean.'])
+        
+        is_valid = self.validator.validate({'is_active': 5})
+        self.assertFalse(is_valid)
+        self.assertListEqual(self.validator.errors['is_active'], ['Must be a valid boolean.'])
+        
+    def test_invalidation_cases_for_created_at_field(self):
+        is_valid = self.validator.validate({'created_at': None})
+        self.assertFalse(is_valid)
+        self.assertListEqual(self.validator.errors['created_at'], ['This field may not be null.'])
+        
+        is_valid = self.validator.validate({'created_at': 5})
+        self.assertFalse(is_valid)
+        self.assertListEqual(self.validator.errors['created_at'],
+                             ['Datetime has wrong format. Use one of these formats instead: '
+                              'YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].'])
+        
