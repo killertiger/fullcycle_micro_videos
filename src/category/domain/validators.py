@@ -1,12 +1,12 @@
 from typing import Any
 from rest_framework import serializers
 
-from __seedwork.domain.validators import DRFValidator
+from __seedwork.domain.validators import DRFValidator, StrictCharField, StrictBooleanField
 
 class CategoryRules(serializers.Serializer):
-    name = serializers.CharField(max_length=255)
-    description = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    is_active = serializers.BooleanField(required=False)
+    name = StrictCharField(max_length=255)
+    description = StrictCharField(required=False, allow_null=True, allow_blank=True)
+    is_active = StrictBooleanField(required=False)
     created_at = serializers.DateTimeField(required=False)
     
 
