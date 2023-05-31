@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from __seedwork.domain.entities import Entity
-# from __seedwork.domain.validators import ValidatorRules
+from __seedwork.domain.exceptions import EntityValidationException
 from category.domain.validators import CategoryValidatorFactory
 
 
@@ -15,24 +15,24 @@ class Category(Entity):
     created_at: Optional[datetime] = field(
         default_factory=lambda: datetime.now())
 
-    def __new__(cls, **kwargs):
-        cls.validate(
-            name = kwargs.get('name'),
-            description = kwargs.get('description'),
-            is_active = kwargs.get('is_active'),
-            created_at = kwargs.get('created_at')
-        )
-        return super(Category, cls).__new__(cls)
+    # def __new__(cls, **kwargs):
+    #     cls.validate(
+    #         name = kwargs.get('name'),
+    #         description = kwargs.get('description'),
+    #         is_active = kwargs.get('is_active'),
+    #         created_at = kwargs.get('created_at')
+    #     )
+    #     return super(Category, cls).__new__(cls)
     
     def __post_init__(self):
         if not self.created_at:
             self._set('created_at', datetime.now())
-            # self.created_at = datetime.now()
+        self.validate()
 
     def update(self, name: str, description: str):
-        self.validate(name, description)
         self._set('name', name)
         self._set('description', description)
+        self.validate()
 
     def activate(self):
         self._set('is_active', True)
@@ -46,12 +46,8 @@ class Category(Entity):
     #     ValidatorRules.values(description, 'description').string()
     #     ValidatorRules.values(is_active, 'is_active').boolean()
 
-    @classmethod
-    def validate(cls, name: str, description: str, is_active: bool = None, created_at: datetime = None):
+    def validate(self):
         validator = CategoryValidatorFactory.create()
-        is_valid = validator.validate({
-            'name': name,
-            'description': description,
-            'is_active': is_active,
-            'created_at': created_at
-        })
+        is_valid = validator.validate(self.to_dict())
+        if not is_valid:
+            raise EntityValidationException(validator.errors)
