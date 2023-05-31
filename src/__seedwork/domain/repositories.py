@@ -41,7 +41,7 @@ class InMemoryRepository(RepositoryInterface[ET], ABC):
         return self._get(id_str)
     
     def find_all(self) -> List[ET]:
-        raise NotImplementedError()
+        return self.items
     
     def update(self, entity: ET) -> None:
         entity_found = self._get(entity.id)
