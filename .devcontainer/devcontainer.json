@@ -37,7 +37,8 @@
 				"bungcip.better-toml",
 				"johnpapa.vscode-peacock",
 				"ms-azuretools.vscode-docker",
-				"vscode-icons-team.vscode-icons"
+				"vscode-icons-team.vscode-icons",
+				"ms-python.black-formatter"
 			],
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "zsh"
