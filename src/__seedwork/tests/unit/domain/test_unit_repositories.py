@@ -1,6 +1,6 @@
 import unittest
 from dataclasses import dataclass
-from __seedwork.domain.repositories import InMemoryRepository, RepositoryInterface
+from __seedwork.domain.repositories import InMemoryRepository, RepositoryInterface, SearchableRepositoryInterface
 from __seedwork.domain.entities import Entity
 from __seedwork.domain.exceptions import NotFoundException
 from __seedwork.domain.value_objects import UniqueEntityId
@@ -109,3 +109,11 @@ class TestInMemoryRepository(unittest.TestCase):
         
         self.repo.delete(entity.unique_entity_id)
         self.assertListEqual(self.repo.items, [])
+        
+class TestSearchableRepositoryInterface(unittest.TestCase):
+    
+    def test_throw_error_when_not_implemented(self):
+        with self.assertRaises(TypeError) as assert_error:
+            SearchableRepositoryInterface()
+        self.assertEqual(assert_error.exception.args[0], "Can't instantiate abstract class SearchableRepositoryInterface " +
+                         "with abstract methods delete, find_all, find_by_id, insert, search, update")
