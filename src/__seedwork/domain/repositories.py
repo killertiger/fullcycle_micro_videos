@@ -61,13 +61,13 @@ class SearchParams(Generic[Filter]):
         self._normalize_filter()
     
     def _normalize_page(self):
-        page = self._convert_to_int(page)
+        page = self._convert_to_int(self.page)
         if page <= 0:
             page = self._get_dataclass_field('page').default
         self.page = page
     
     def _normalize_per_page(self):
-        per_page = self._convert_to_int(per_page)
+        per_page = self._convert_to_int(self.per_page)
         if per_page < 1:
             per_page = self._get_dataclass_field('per_page').default
         self.per_page = per_page
@@ -80,7 +80,7 @@ class SearchParams(Generic[Filter]):
             self.sort_dir = None
             return
         
-        sort_dir = str(self.sort).lower()
+        sort_dir = str(self.sort_dir).lower()
         self.sort_dir = 'asc' if sort_dir not in ['asc', 'desc'] else sort_dir
     
     def _normalize_filter(self):
