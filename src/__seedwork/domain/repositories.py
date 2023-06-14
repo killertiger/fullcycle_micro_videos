@@ -53,40 +53,42 @@ class SearchParams(Generic[Filter]):
     sort: Optional[str] = None
     sort_dir: Optional[str] = None
     filter: Optional[Filter] = None
-    
+
     def __post_init__(self):
         self._normalize_page()
         self._normalize_per_page()
         self._normalize_sort()
         self._normalize_sort_dir()
         self._normalize_filter()
-    
+
     def _normalize_page(self):
         page = self._convert_to_int(self.page)
         if page <= 0:
             page = self._get_dataclass_field('page').default
         self.page = page
-    
+
     def _normalize_per_page(self):
         per_page = self._convert_to_int(self.per_page)
         if per_page < 1:
             per_page = self._get_dataclass_field('per_page').default
         self.per_page = per_page
-    
+
     def _normalize_sort(self):
-        self.sort = None if self.sort == "" or self.sort is None else str(self.sort)
-    
+        self.sort = None if self.sort == "" or self.sort is None else str(
+            self.sort)
+
     def _normalize_sort_dir(self):
         if not self.sort:
             self.sort_dir = None
             return
-        
+
         sort_dir = str(self.sort_dir).lower()
         self.sort_dir = 'asc' if sort_dir not in ['asc', 'desc'] else sort_dir
-    
+
     def _normalize_filter(self):
         self.filter = (
-            None if self.filter == "" or self.filter is None else str(self.filter)
+            None if self.filter == "" or self.filter is None else str(
+                self.filter)
         )
 
     def _convert_to_int(self, value: Any, default=0) -> int:
@@ -94,9 +96,10 @@ class SearchParams(Generic[Filter]):
             return int(value)
         except (ValueError, TypeError):
             return default
-        
+
     def _get_dataclass_field(self, field_name):
         return SearchParams.__dataclass_fields__[field_name]
+
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class SearchResult(Generic[ET, Filter]):
@@ -108,11 +111,11 @@ class SearchResult(Generic[ET, Filter]):
     sort: Optional[str] = None
     sort_dir: Optional[str] = None
     filter: Optional[Filter] = None
-    
+
     def __post_init__(self):
         calculated_last_page = math.ceil(self.total / self.per_page)
         object.__setattr__(self, 'last_page', calculated_last_page)
-        
+
     def to_dict(self):
         return {
             'items': self.items,
@@ -124,6 +127,7 @@ class SearchResult(Generic[ET, Filter]):
             'sort_dir': self.sort_dir,
             'filter': self.filter
         }
+
 
 @dataclass(slots=True)
 class InMemoryRepository(RepositoryInterface[ET], ABC):
@@ -154,3 +158,36 @@ class InMemoryRepository(RepositoryInterface[ET], ABC):
         if not entity:
             raise NotFoundException(f"Entity not found using ID '{entity_id}'")
         return entity
+
+
+class InMemorySearchableRepository(
+    Generic[ET, Filter],
+    InMemoryRepository[ET],
+    SearchableRepositoryInterface[ET, SearchParams, SearchResult]
+):
+    def search(self, input_params: SearchParams[Filter]) -> SearchResult[Filter]:
+        items_filtered = self._apply_filter(self.items, input_params.filter)
+        items_sorted = self._apply_sort(
+            items_filtered, input_params.sort, input_params.sort_dir)
+        items_paginated = self._apply_paginate(
+            items_sorted, input_params.page, input_params.per_page)
+
+        return SearchResult(
+            items=items_paginated,
+            total=len(items_filtered),
+            current_page=input_params.page,
+            per_page=input_params.per_page,
+            sort=input_params.sort,
+            sort_dir=input_params.sort_dir,
+            filter=input_params.filter
+        )
+
+    @abstractmethod
+    def _apply_filter(self, items, filter_param: Filter | None):
+        raise NotImplementedError()
+
+    def _apply_sort(self, items, sort: str | None, sort_dir: str | None):
+        pass
+
+    def _apply_paginate(self, items, page: int, per_page: int):
+        pass
