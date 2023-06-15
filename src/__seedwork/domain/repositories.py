@@ -38,6 +38,8 @@ Output = TypeVar('Output')
 
 class SearchableRepositoryInterface(Generic[ET, Input, Output], RepositoryInterface[ET], ABC):
 
+    sortable_fields: List[str] = []
+
     @abstractmethod
     def search(self, input_params: Input) -> Output:
         raise NotImplementedError()
@@ -163,9 +165,9 @@ class InMemoryRepository(RepositoryInterface[ET], ABC):
 class InMemorySearchableRepository(
     Generic[ET, Filter],
     InMemoryRepository[ET],
-    SearchableRepositoryInterface[ET, SearchParams, SearchResult]
+    SearchableRepositoryInterface[ET, SearchParams[Filter], SearchResult[ET, Filter]]
 ):
-    def search(self, input_params: SearchParams[Filter]) -> SearchResult[Filter]:
+    def search(self, input_params: SearchParams[Filter]) -> SearchResult[ET, Filter]:
         items_filtered = self._apply_filter(self.items, input_params.filter)
         items_sorted = self._apply_sort(
             items_filtered, input_params.sort, input_params.sort_dir)
@@ -183,11 +185,16 @@ class InMemorySearchableRepository(
         )
 
     @abstractmethod
-    def _apply_filter(self, items, filter_param: Filter | None):
+    def _apply_filter(self, items: List[ET], filter_param: Filter | None) -> List[ET]:
         raise NotImplementedError()
 
-    def _apply_sort(self, items, sort: str | None, sort_dir: str | None):
-        pass
+    def _apply_sort(self, items: List[ET], sort: str | None, sort_dir: str | None) -> List[ET]:
+        if sort and sort in self.sortable_fields:
+            is_reverse = sort_dir == 'desc'
+            return sorted(items, key=lambda item: getattr(item, sort), reverse=is_reverse)
+        return items
 
-    def _apply_paginate(self, items, page: int, per_page: int):
-        pass
+    def _apply_paginate(self, items: List[ET], page: int, per_page: int) -> List[ET]:
+        start = (page - 1) * per_page
+        limit = start + per_page
+        return items[slice(start, limit)]
