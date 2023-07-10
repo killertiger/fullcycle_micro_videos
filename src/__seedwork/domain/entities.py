@@ -1,5 +1,5 @@
 from abc import ABC
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, Field
 from typing import Any
 
 from __seedwork.domain.value_objects import UniqueEntityId
@@ -23,3 +23,7 @@ class Entity(ABC):
     def _set(self, name: str, value: Any):
         object.__setattr__(self, name, value)
         return self
+    
+    @classmethod
+    def get_field(cls, entity_field:str ) -> Field:
+        return cls.__dataclass_fields__[entity_field]
