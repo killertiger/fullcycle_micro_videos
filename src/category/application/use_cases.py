@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import Optional
-from datetime import datetime
+from __seedwork.application.use_cases import UseCase
 from category.domain.entities import Category
 from category.domain.repositories import CategoryRepository
-from .dto import CategoryOutput
+from .dto import CategoryOutput, CategoryOutputMapper
 
 @dataclass(slots=True, frozen=True)
-class CreateCategoryUseCase:
+class CreateCategoryUseCase(UseCase):
 
     category_repo: CategoryRepository
 
@@ -19,14 +19,11 @@ class CreateCategoryUseCase:
         
         self.category_repo.insert(category)
         
-        return self.Output(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            is_active=category.is_active,
-            created_at=category.created_at
-        )
+        return self.__to_output(category)
 
+    def __to_output(self, category: Category):
+        return CategoryOutputMapper.to_output(category)
+    
     @dataclass(slots=True, frozen=True)
     class Input:
         name: str
@@ -39,20 +36,17 @@ class CreateCategoryUseCase:
 
 
 @dataclass(slots=True, frozen=True)
-class GetCategoryUseCase:
+class GetCategoryUseCase(UseCase):
 
     category_repo: CategoryRepository
 
     def execute(self, input_param: 'Input') -> 'Output':
         category = self.category_repo.find_by_id(input_param.id)
         
-        return self.Output(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            is_active=category.is_active,
-            created_at=category.created_at
-        )
+        return self.__to_output(category)
+        
+    def __to_output(self, category: Category):
+        return CategoryOutputMapper.to_output(category)
 
     @dataclass(slots=True, frozen=True)
     class Input:
