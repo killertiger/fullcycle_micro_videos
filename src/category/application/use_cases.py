@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 from category.domain.entities import Category
 from category.domain.repositories import CategoryRepository
+from .dto import CategoryOutput
 
 @dataclass(slots=True, frozen=True)
 class CreateCategoryUseCase:
@@ -33,12 +34,8 @@ class CreateCategoryUseCase:
         is_active: Optional[bool] = Category.get_field('is_active').default
 
     @dataclass(slots=True, frozen=True)
-    class Output:
-        id: str
-        name: str
-        description: Optional[str]
-        is_active: bool
-        created_at: datetime
+    class Output(CategoryOutput):
+        pass
 
 
 @dataclass(slots=True, frozen=True)
@@ -62,12 +59,8 @@ class GetCategoryUseCase:
         id: str
 
     @dataclass(slots=True, frozen=True)
-    class Output:
-        id: str
-        name: str
-        description: Optional[str]
-        is_active: bool
-        created_at: datetime
+    class Output(CategoryOutput):
+        pass
 
 # Learning:
 # SOLID - S = Single Responsibility

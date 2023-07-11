@@ -6,6 +6,7 @@ from category.application.use_cases import (
     CreateCategoryUseCase,
     GetCategoryUseCase
     )
+from category.application.dto import CategoryOutput
 from category.domain.repositories import CategoryInMemoryRepository
 from category.domain.entities import Category
 from __seedwork.domain.exceptions import NotFoundException
@@ -34,6 +35,14 @@ class TestCreateCategoryUnitCaseUnit(unittest.TestCase):
         
         is_active_field = CreateCategoryUseCase.Input.__dataclass_fields__['is_active']
         self.assertEqual(is_active_field.default, Category.get_field('is_active').default)
+        
+    def test_output(self) -> None:
+        self.assertTrue(
+            issubclass(
+                CreateCategoryUseCase.Output,
+                CategoryOutput
+            )
+        )
     
     def test_execute(self) -> None:
         with patch.object(self.category_repo, 'insert', wraps=self.category_repo.insert) as spy_insert:
@@ -89,6 +98,14 @@ class TestGetCategoryUnitCaseUnit(unittest.TestCase):
             self.use_case.execute(input_param)
         self.assertEqual(assert_error.exception.args[0], "Entity not found using ID 'fake id'")
     
+    def test_output(self) -> None:
+        self.assertTrue(
+            issubclass(
+                GetCategoryUseCase.Output,
+                CategoryOutput
+            )
+        )
+    
     def test_execute(self) -> None:
         category = Category(name='Movie')
         self.category_repo.items = [category]
@@ -104,23 +121,3 @@ class TestGetCategoryUnitCaseUnit(unittest.TestCase):
                 is_active=True,
                 created_at=self.category_repo.items[0].created_at
             ))
-            
-        #     input_param = CreateCategoryUseCase.Input(name='Movie 2', description='test description 2', is_active=False)
-        #     output = self.use_case.execute(input_param)
-        #     self.assertEqual(output, CreateCategoryUseCase.Output(
-        #         id=self.category_repo.items[1].id,
-        #         name='Movie 2',
-        #         description='test description 2',
-        #         is_active=False,
-        #         created_at=self.category_repo.items[1].created_at
-        #     ))
-        
-        #     input_param = CreateCategoryUseCase.Input(name='Movie 3', description='test description 3', is_active=True)
-        #     output = self.use_case.execute(input_param)
-        #     self.assertEqual(output, CreateCategoryUseCase.Output(
-        #         id=self.category_repo.items[2].id,
-        #         name='Movie 3',
-        #         description='test description 3',
-        #         is_active=True,
-        #         created_at=self.category_repo.items[2].created_at
-        #     ))
