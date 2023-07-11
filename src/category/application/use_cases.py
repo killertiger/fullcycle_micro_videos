@@ -40,6 +40,35 @@ class CreateCategoryUseCase:
         is_active: bool
         created_at: datetime
 
+
+@dataclass(slots=True, frozen=True)
+class GetCategoryUseCase:
+
+    category_repo: CategoryRepository
+
+    def execute(self, input_param: 'Input') -> 'Output':
+        category = self.category_repo.find_by_id(input_param.id)
+        
+        return self.Output(
+            id=category.id,
+            name=category.name,
+            description=category.description,
+            is_active=category.is_active,
+            created_at=category.created_at
+        )
+
+    @dataclass(slots=True, frozen=True)
+    class Input:
+        id: str
+
+    @dataclass(slots=True, frozen=True)
+    class Output:
+        id: str
+        name: str
+        description: Optional[str]
+        is_active: bool
+        created_at: datetime
+
 # Learning:
 # SOLID - S = Single Responsibility
 # The class should have only one responsibility
