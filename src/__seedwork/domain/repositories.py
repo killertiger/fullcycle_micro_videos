@@ -1,6 +1,6 @@
 import math
 from abc import ABC, abstractmethod
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, Field
 from typing import Generic, TypeVar, List, Optional, Any
 from __seedwork.domain.value_objects import UniqueEntityId
 from __seedwork.domain.entities import Entity
@@ -101,7 +101,7 @@ class SearchParams(Generic[Filter]):
 
     def _get_dataclass_field(self, field_name):
         return SearchParams.__dataclass_fields__[field_name]
-
+    
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class SearchResult(Generic[ET, Filter]):

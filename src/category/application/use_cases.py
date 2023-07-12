@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, asdict
+from typing import Optional, List
 from __seedwork.application.use_cases import UseCase
 from category.domain.entities import Category
 from category.domain.repositories import CategoryRepository
@@ -55,6 +55,44 @@ class GetCategoryUseCase(UseCase):
     @dataclass(slots=True, frozen=True)
     class Output(CategoryOutput):
         pass
+
+@dataclass(slots=True, frozen=True)
+class ListCategoriesUseCase(UseCase):
+
+    category_repo: CategoryRepository
+
+    def execute(self, input_param: 'Input') -> 'Output':
+        search_params = self.category_repo.SearchParams(**asdict(input_param))
+        search_result = self.category_repo.search(search_params)
+        
+        return self.__to_output(search_result)
+        
+    def __to_output(self, search_result: CategoryRepository.SearchResult):
+        return ListCategoriesUseCase.Output(
+            items=list(
+                map(CategoryOutputMapper.to_output, search_result.items)
+            ),
+            total=search_result.total,
+            current_page=search_result.current_page,
+            per_page=search_result.per_page,
+            last_page=search_result.last_page
+        )
+
+    @dataclass(slots=True, frozen=True)
+    class Input:
+        page: Optional[int] = None
+        per_page: Optional[int] = None
+        sort: Optional[str] = None
+        sort_dir: Optional[str] = None
+        filter: Optional[str] = None
+
+    @dataclass(slots=True, frozen=True)
+    class Output:
+        items: List[CategoryOutput]
+        total: int
+        current_page: int
+        per_page: int
+        last_page: int
 
 # Learning:
 # SOLID - S = Single Responsibility

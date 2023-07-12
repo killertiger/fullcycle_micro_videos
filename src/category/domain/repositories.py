@@ -33,5 +33,6 @@ class CategoryInMemoryRepository(CategoryRepository, InMemorySearchableRepositor
     def _apply_sort(self, items: List, sort: str | None, sort_dir: str | None) -> List:
         if not sort:
             sort = 'created_at'
+            sort_dir = 'desc'
             
         return super()._apply_sort(items, sort, sort_dir)
