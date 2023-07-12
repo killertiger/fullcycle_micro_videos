@@ -1,6 +1,7 @@
 from dataclasses import dataclass, asdict
 from typing import Optional, List
 from __seedwork.application.use_cases import UseCase
+from __seedwork.application.dto import PaginationOutput, PaginationOutputMapper, SearchInput
 from category.domain.entities import Category
 from category.domain.repositories import CategoryRepository
 from .dto import CategoryOutput, CategoryOutputMapper
@@ -68,31 +69,21 @@ class ListCategoriesUseCase(UseCase):
         return self.__to_output(search_result)
         
     def __to_output(self, search_result: CategoryRepository.SearchResult):
-        return ListCategoriesUseCase.Output(
-            items=list(
+        items=list(
                 map(CategoryOutputMapper.to_output, search_result.items)
-            ),
-            total=search_result.total,
-            current_page=search_result.current_page,
-            per_page=search_result.per_page,
-            last_page=search_result.last_page
         )
+        
+        return PaginationOutputMapper\
+            .from_child(ListCategoriesUseCase.Output)\
+            .to_output(items, search_result)
 
     @dataclass(slots=True, frozen=True)
-    class Input:
-        page: Optional[int] = None
-        per_page: Optional[int] = None
-        sort: Optional[str] = None
-        sort_dir: Optional[str] = None
-        filter: Optional[str] = None
+    class Input(SearchInput[str]):
+        pass
 
     @dataclass(slots=True, frozen=True)
-    class Output:
-        items: List[CategoryOutput]
-        total: int
-        current_page: int
-        per_page: int
-        last_page: int
+    class Output(PaginationOutput[CategoryOutput]):
+        pass
 
 # Learning:
 # SOLID - S = Single Responsibility
