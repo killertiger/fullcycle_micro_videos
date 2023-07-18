@@ -23,7 +23,7 @@ class CreateCategoryUseCase(UseCase):
         return self.__to_output(category)
 
     def __to_output(self, category: Category):
-        return CategoryOutputMapper.to_output(category)
+        return CategoryOutputMapper.from_child(CreateCategoryUseCase.Output).to_output(category)
     
     @dataclass(slots=True, frozen=True)
     class Input:
@@ -47,7 +47,7 @@ class GetCategoryUseCase(UseCase):
         return self.__to_output(category)
         
     def __to_output(self, category: Category):
-        return CategoryOutputMapper.to_output(category)
+        return CategoryOutputMapper.from_child(GetCategoryUseCase.Output).to_output(category)
 
     @dataclass(slots=True, frozen=True)
     class Input:
@@ -70,7 +70,7 @@ class ListCategoriesUseCase(UseCase):
         
     def __to_output(self, search_result: CategoryRepository.SearchResult):
         items=list(
-                map(CategoryOutputMapper.to_output, search_result.items)
+                map(CategoryOutputMapper.without_child().to_output, search_result.items)
         )
         
         return PaginationOutputMapper\

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 import unittest
 from unittest.mock import patch
+from __seedwork.application.dto import PaginationOutput, PaginationOutputMapper, SearchInput
 
 from __seedwork.application.use_cases import UseCase
 from category.application.use_cases import (
@@ -10,7 +11,7 @@ from category.application.use_cases import (
     ListCategoriesUseCase,
     )
 from category.application.dto import CategoryOutput, CategoryOutputMapper
-from category.domain.repositories import CategoryInMemoryRepository
+from category.domain.repositories import CategoryInMemoryRepository, CategoryRepository
 from category.domain.entities import Category
 from __seedwork.domain.exceptions import NotFoundException
 
@@ -144,6 +145,42 @@ class TestListCategoryUseCase(unittest.TestCase):
     def test_instance_use_case(self):
         self.assertIsInstance(self.use_case, ListCategoriesUseCase)
         
+    def test_input(self):
+        self.assertTrue(issubclass(ListCategoriesUseCase.Input, SearchInput))
+        
+    def test_output(self):
+        self.assertTrue(issubclass(ListCategoriesUseCase.Output, PaginationOutput))
+        
+    def test__to_output(self):
+        entity = Category(name='Movie')
+        default_props = {
+            'total': 1,
+            'current_page': 1,
+            'per_page': 2,
+            'sort': None,
+            'sort_dir': None,
+            'filter': None
+        }
+        
+        result = CategoryRepository.SearchResult(items=[], **default_props)
+        output = self.use_case._ListCategoriesUseCase__to_output(result)
+        self.assertEqual(output, ListCategoriesUseCase.Output(
+            items=[],
+            total=1,
+            current_page=1,
+            per_page=2,
+            last_page=1,
+        ))
+        
+        result = CategoryRepository.SearchResult(items=[entity], **default_props)
+        output = self.use_case._ListCategoriesUseCase__to_output(result)
+        self.assertEqual(output,
+                         PaginationOutputMapper.from_child(ListCategoriesUseCase.Output).to_output(
+                             [CategoryOutputMapper.without_child().to_output(entity)],
+                             result
+                        ))
+        
+        
     def test_execute_using_empty_search_params(self):
         self.category_repo.items = [
             Category(name='Movie 1'),
@@ -158,7 +195,7 @@ class TestListCategoryUseCase(unittest.TestCase):
             
             self.assertEqual(output, ListCategoriesUseCase.Output(
                 items=list(
-                    map(CategoryOutputMapper.to_output,
+                    map(CategoryOutputMapper.without_child().to_output,
                         self.category_repo.items[::-1]
                     )
                 ),
@@ -188,7 +225,7 @@ class TestListCategoryUseCase(unittest.TestCase):
         output = self.use_case.execute(input_param=input_param)
         self.assertEqual(output, ListCategoriesUseCase.Output(
             items=list(
-                map(CategoryOutputMapper.to_output, [items[1], items[2]])
+                map(CategoryOutputMapper.without_child().to_output, [items[1], items[2]])
             ),
             total=3,
             current_page=1,
@@ -206,7 +243,7 @@ class TestListCategoryUseCase(unittest.TestCase):
         output = self.use_case.execute(input_param=input_param)
         self.assertEqual(output, ListCategoriesUseCase.Output(
             items=list(
-                map(CategoryOutputMapper.to_output, [items[0]])
+                map(CategoryOutputMapper.without_child().to_output, [items[0]])
             ),
             total=3,
             current_page=2,
@@ -224,7 +261,7 @@ class TestListCategoryUseCase(unittest.TestCase):
         output = self.use_case.execute(input_param=input_param)
         self.assertEqual(output, ListCategoriesUseCase.Output(
             items=list(
-                map(CategoryOutputMapper.to_output, [items[0], items[2]])
+                map(CategoryOutputMapper.without_child().to_output, [items[0], items[2]])
             ),
             total=3,
             current_page=1,
@@ -242,7 +279,7 @@ class TestListCategoryUseCase(unittest.TestCase):
         output = self.use_case.execute(input_param=input_param)
         self.assertEqual(output, ListCategoriesUseCase.Output(
             items=list(
-                map(CategoryOutputMapper.to_output, [items[1]])
+                map(CategoryOutputMapper.without_child().to_output, [items[1]])
             ),
             total=3,
             current_page=2,

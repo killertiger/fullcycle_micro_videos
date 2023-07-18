@@ -30,8 +30,8 @@ class TestCategoryInMemoryRepository(unittest.TestCase):
         result = self.repo.search(CategoryRepository.SearchParams(filter='ma'))
         
         self.assertEqual(result.items, [
-            Category('8d16fd4b-3caf-4bc6-9c9b-76f7bc1e639b', name='Romance', created_at=datetime(2023, 7, 18)),
             Category('50fed266-1a0e-11ee-be56-0242ac120002', name='Drama', created_at=datetime(2023, 11, 5)),
+            Category('8d16fd4b-3caf-4bc6-9c9b-76f7bc1e639b', name='Romance', created_at=datetime(2023, 7, 18)),
         ])
         
         result = self.repo.search(CategoryRepository.SearchParams(filter='ma', sort='name'))
