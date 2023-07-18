@@ -101,7 +101,7 @@ class SearchParams(Generic[Filter]):
 
     def _get_dataclass_field(self, field_name):
         return SearchParams.__dataclass_fields__[field_name]
-    
+
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class SearchResult(Generic[ET, Filter]):
@@ -165,7 +165,8 @@ class InMemoryRepository(RepositoryInterface[ET], ABC):
 class InMemorySearchableRepository(
     Generic[ET, Filter],
     InMemoryRepository[ET],
-    SearchableRepositoryInterface[ET, SearchParams[Filter], SearchResult[ET, Filter]]
+    SearchableRepositoryInterface[ET,
+                                  SearchParams[Filter], SearchResult[ET, Filter]]
 ):
     def search(self, input_params: SearchParams[Filter]) -> SearchResult[ET, Filter]:
         items_filtered = self._apply_filter(self.items, input_params.filter)

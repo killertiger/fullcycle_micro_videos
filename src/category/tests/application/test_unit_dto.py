@@ -5,6 +5,7 @@ from datetime import datetime
 from category.application.dto import CategoryOutput, CategoryOutputMapper
 from category.domain.entities import Category
 
+
 class TestCategoryOutputUnit(unittest.TestCase):
     def test_fields(self):
         self.assertEqual(CategoryOutput.__annotations__, {
@@ -14,13 +15,14 @@ class TestCategoryOutputUnit(unittest.TestCase):
             'is_active': bool,
             'created_at': datetime
         })
-        
+
+
 class CategoryOuputChild(CategoryOutput):
     pass
 
-        
+
 class TestCategoryOutputMapperUnit(unittest.TestCase):
-    
+
     def test_to_output_from_child(self):
         mapper = CategoryOutputMapper\
             .from_child(CategoryOuputChild)
@@ -42,7 +44,7 @@ class TestCategoryOutputMapperUnit(unittest.TestCase):
                 CategoryOutput
             )
         )
-        
+
     def test_to_output(self):
         created_at = datetime.now()
         category = Category(
@@ -59,8 +61,9 @@ class TestCategoryOutputMapperUnit(unittest.TestCase):
             is_active=category.is_active,
             created_at=category.created_at
         ))
-        
-        output = CategoryOutputMapper.from_child(CategoryOuputChild).to_output(category)
+
+        output = CategoryOutputMapper.from_child(
+            CategoryOuputChild).to_output(category)
         self.assertEqual(output, CategoryOuputChild(
             id=category.id,
             name=category.name,

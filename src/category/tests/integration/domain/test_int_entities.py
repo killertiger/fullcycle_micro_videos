@@ -24,15 +24,15 @@ class TestCategoryIntegration(unittest.TestCase):
                 'expected': 'Ensure this field has no more than 255 characters.'
             },
         ]
-        
+
         for i in invalid_data:
             with self.assertRaises(EntityValidationException) as assert_error:
                 Category(**i['data'])
             self.assertIn('name', assert_error.exception.error)
             self.assertEqual(
-                             assert_error.exception.error['name'],
-                             [i['expected']],
-                             f'Expected: {i["expected"]}, actual: {assert_error.exception.error["name"][0]}')
+                assert_error.exception.error['name'],
+                [i['expected']],
+                f'Expected: {i["expected"]}, actual: {assert_error.exception.error["name"][0]}')
 
     def test_create_with_invalid_cases_for_description_prop(self):
         with self.assertRaises(EntityValidationException) as assert_error:
@@ -78,15 +78,15 @@ class TestCategoryIntegration(unittest.TestCase):
                 'expected': 'Ensure this field has no more than 255 characters.'
             },
         ]
-        
+
         for i in invalid_data:
             with self.assertRaises(EntityValidationException) as assert_error:
                 Category(**i['data'])
             self.assertIn('name', assert_error.exception.error)
             self.assertEqual(
-                             assert_error.exception.error['name'],
-                             [i['expected']],
-                             f'Expected: {i["expected"]}, actual: {assert_error.exception.error["name"][0]}')
+                assert_error.exception.error['name'],
+                [i['expected']],
+                f'Expected: {i["expected"]}, actual: {assert_error.exception.error["name"][0]}')
 
     def test_update_with_invalid_cases_for_description(self):
         category = Category(name='Movie')

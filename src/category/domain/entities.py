@@ -23,7 +23,7 @@ class Category(Entity):
     #         created_at = kwargs.get('created_at')
     #     )
     #     return super(Category, cls).__new__(cls)
-    
+
     def __post_init__(self):
         if not self.created_at:
             self._set('created_at', datetime.now())

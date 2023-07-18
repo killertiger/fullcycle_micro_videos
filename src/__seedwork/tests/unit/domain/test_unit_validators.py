@@ -181,13 +181,13 @@ class TestValidatorFieldsInterfaceUnit(unittest.TestCase):
             ValidatorFieldsInterface()
         self.assertEqual("Can't instantiate abstract class ValidatorFieldsInterface with abstract method validate",
                          assert_error.exception.args[0])
-        
+
     def test_valid_fields(self):
         fields_class = fields(ValidatorFieldsInterface)
         errors_field = fields_class[0]
         self.assertEqual(errors_field.name, 'errors')
         self.assertIsNone(errors_field.default)
-        
+
         validated_data_field = fields_class[1]
         self.assertEqual(validated_data_field.name, 'validated_data')
         self.assertIsNone(validated_data_field.default)
@@ -221,4 +221,3 @@ class TestDRFValidatorUnit(unittest.TestCase):
         self.assertFalse(is_valid)
         self.assertEqual(validator.errors, {'field': ['some error']})
         mock_is_valid.assert_called_once()
-        

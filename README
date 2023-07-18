@@ -1,4 +1,4 @@
-
+pdm run pep8
 pdm run test
 pdm run test_cov
 pdm run test_cov_html

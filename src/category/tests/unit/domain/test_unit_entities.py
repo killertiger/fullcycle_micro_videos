@@ -51,22 +51,20 @@ class TestCategoryUnit(unittest.TestCase):
             category.activate()
 
             self.assertTrue(category.is_active)
-    
+
     def test_deactivate(self):
         with patch.object(Category, 'validate'):
             category = Category(name='Movie 1', is_active=True)
-            
+
             category.deactivate()
 
             self.assertFalse(category.is_active)
-        
+
     def test_update(self):
         with patch.object(Category, 'validate'):
             category = Category(name='Movie 1', description='My description')
 
             category.update(name='Name 2', description='My new description')
-            
+
             self.assertEqual(category.name, 'Name 2')
             self.assertEqual(category.description, 'My new description')
-        
-    

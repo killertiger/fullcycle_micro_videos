@@ -10,38 +10,42 @@ from .exceptions import ValidationException
 if not settings.configured:
     settings.configure(USE_I18N=False)
 
+
 @dataclass(frozen=True, slots=True)
 class ValidatorRules:
     value: Any
     prop: str
-    
+
     @staticmethod
     def values(value, prop) -> 'ValidatorRules':
         return ValidatorRules(value, prop)
-    
+
     def required(self) -> 'ValidatorRules':
         if self.value is None or self.value == "":
             raise ValidationException(f'The {self.prop} is required')
         return self
-    
+
     def string(self) -> 'ValidatorRules':
         if self.value is not None and not isinstance(self.value, str):
             raise ValidationException(f'The {self.prop} must be a string')
         return self
-    
+
     def max_length(self, max_length: int) -> 'ValidatorRules':
         if self.value is not None and len(self.value) > max_length:
-            raise ValidationException(f'The {self.prop} must be less than {max_length} characters')
+            raise ValidationException(
+                f'The {self.prop} must be less than {max_length} characters')
         return self
-    
+
     def boolean(self) -> 'ValidatorRules':
         if self.value is not None and self.value is not True and self.value is not False:
             raise ValidationException(f'The {self.prop} must be a boolean')
         return self
 
+
 ErrorFields = Dict[str, List[str]]
 
 PropsValidated = TypeVar('PropsValidated')
+
 
 @dataclass(slots=True)
 class ValidatorFieldsInterface(ABC, Generic[PropsValidated]):
@@ -52,10 +56,11 @@ class ValidatorFieldsInterface(ABC, Generic[PropsValidated]):
     def validate(self, data: Any) -> bool:
         raise NotImplementedError()
 
+
 class DRFValidator(ValidatorFieldsInterface[PropsValidated], ABC):
     def validate(self, data: Serializer) -> bool:
         serializer = data
-        
+
         if serializer.is_valid():
             self.validated_data = serializer.validated_data
             return True
@@ -66,13 +71,15 @@ class DRFValidator(ValidatorFieldsInterface[PropsValidated], ABC):
             }
             return False
 
+
 class StrictCharField(CharField):
     def to_internal_value(self, data):
         if not isinstance(data, str):
             self.fail('invalid')
-            
+
         return super().to_internal_value(data)
-    
+
+
 class StrictBooleanField(BooleanField):
     def to_internal_value(self, data):
         try:
@@ -85,5 +92,3 @@ class StrictBooleanField(BooleanField):
         except TypeError:
             pass
         self.fail('invalid', input=data)
-        
-    

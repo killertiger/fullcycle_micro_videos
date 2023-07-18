@@ -6,6 +6,7 @@ from category.domain.entities import Category
 from category.domain.repositories import CategoryRepository
 from .dto import CategoryOutput, CategoryOutputMapper
 
+
 @dataclass(slots=True, frozen=True)
 class CreateCategoryUseCase(UseCase):
 
@@ -17,14 +18,14 @@ class CreateCategoryUseCase(UseCase):
             description=input_param.description,
             is_active=input_param.is_active
         )
-        
+
         self.category_repo.insert(category)
-        
+
         return self.__to_output(category)
 
     def __to_output(self, category: Category):
         return CategoryOutputMapper.from_child(CreateCategoryUseCase.Output).to_output(category)
-    
+
     @dataclass(slots=True, frozen=True)
     class Input:
         name: str
@@ -43,9 +44,9 @@ class GetCategoryUseCase(UseCase):
 
     def execute(self, input_param: 'Input') -> 'Output':
         category = self.category_repo.find_by_id(input_param.id)
-        
+
         return self.__to_output(category)
-        
+
     def __to_output(self, category: Category):
         return CategoryOutputMapper.from_child(GetCategoryUseCase.Output).to_output(category)
 
@@ -57,6 +58,7 @@ class GetCategoryUseCase(UseCase):
     class Output(CategoryOutput):
         pass
 
+
 @dataclass(slots=True, frozen=True)
 class ListCategoriesUseCase(UseCase):
 
@@ -65,14 +67,14 @@ class ListCategoriesUseCase(UseCase):
     def execute(self, input_param: 'Input') -> 'Output':
         search_params = self.category_repo.SearchParams(**asdict(input_param))
         search_result = self.category_repo.search(search_params)
-        
+
         return self.__to_output(search_result)
-        
+
     def __to_output(self, search_result: CategoryRepository.SearchResult):
-        items=list(
-                map(CategoryOutputMapper.without_child().to_output, search_result.items)
+        items = list(
+            map(CategoryOutputMapper.without_child().to_output, search_result.items)
         )
-        
+
         return PaginationOutputMapper\
             .from_child(ListCategoriesUseCase.Output)\
             .to_output(items, search_result)

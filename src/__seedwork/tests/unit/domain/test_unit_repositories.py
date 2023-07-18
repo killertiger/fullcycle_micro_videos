@@ -534,7 +534,7 @@ class TestInMemorySearchableRepository(unittest.TestCase):
                 )
             },
         ]
-        
+
         for index, item in enumerate(arrange_by_asc):
             result = self.repo.search(item['input'])
             self.assertEqual(result,
@@ -579,13 +579,13 @@ class TestInMemorySearchableRepository(unittest.TestCase):
                 )
             },
         ]
-        
+
         for index, item in enumerate(arrange_by_asc):
             result = self.repo.search(item['input'])
             self.assertEqual(result,
                              item['output'],
                              f'The output using sort_dir asc on index {index} is different')
-            
+
     def test_search_applying_filter_and_sort_and_paginate(self):
         items = [
             StubEntity(name='test', price=1),
@@ -595,7 +595,7 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             StubEntity(name='Test', price=1),
         ]
         self.repo.items = items
-        
+
         result = self.repo.search(SearchParams(
             page=1, per_page=2, sort='name', sort_dir='asc', filter='TEST'
         ))
@@ -608,7 +608,7 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             sort_dir='asc',
             filter='TEST'
         ))
-        
+
         result = self.repo.search(SearchParams(
             page=2, per_page=2, sort='name', sort_dir='asc', filter='TEST'
         ))

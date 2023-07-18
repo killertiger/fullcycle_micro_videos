@@ -15,6 +15,7 @@ class TestSearchInput(unittest.TestCase):
             'filter': Optional[Filter]
         })
 
+
 class TestPaginationOutput(unittest.TestCase):
     def test_fields(self):
         self.assertEqual(PaginationOutput.__annotations__, {
@@ -24,10 +25,12 @@ class TestPaginationOutput(unittest.TestCase):
             'last_page': int,
             'per_page': int,
         })
-        
+
+
 class PaginationOutputChild(PaginationOutput):
     pass
-        
+
+
 class TestPaginationOutputMapper(unittest.TestCase):
     def test_from_child(self):
         mapper = PaginationOutputMapper\
@@ -39,7 +42,7 @@ class TestPaginationOutputMapper(unittest.TestCase):
                 PaginationOutputChild
             )
         )
-        
+
     def test_to_output(self):
         result = SearchResult(
             items=['fake'],
@@ -50,14 +53,14 @@ class TestPaginationOutputMapper(unittest.TestCase):
             sort_dir='asc',
             filter='filter fake'
         )
-        
+
         output = PaginationOutputMapper\
             .from_child(PaginationOutputChild)\
             .to_output(result.items, result=result)
         self.assertEqual(output, PaginationOutputChild(
-                items=result.items,
-                total=result.total,
-                current_page=result.current_page,
-                last_page=result.last_page,
-                per_page=result.per_page
+            items=result.items,
+            total=result.total,
+            current_page=result.current_page,
+            last_page=result.last_page,
+            per_page=result.per_page
         ))
