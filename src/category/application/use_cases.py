@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import Optional, List
+from typing import Optional
 from __seedwork.application.use_cases import UseCase
 from __seedwork.application.dto import PaginationOutput, PaginationOutputMapper, SearchInput
 from category.domain.entities import Category

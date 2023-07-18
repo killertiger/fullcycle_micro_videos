@@ -85,9 +85,9 @@ class StrictBooleanField(BooleanField):
         try:
             if data is True:
                 return True
-            elif data is False:
+            if data is False:
                 return False
-            elif data is None and self.allow_null:
+            if data is None and self.allow_null:
                 return None
         except TypeError:
             pass

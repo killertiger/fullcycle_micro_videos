@@ -14,19 +14,6 @@ class CategoryOutput:
     created_at: datetime
 
 
-class CategoryOutputMapper:
-
-    @staticmethod
-    def to_output(category: Category) -> CategoryOutput:
-        return CategoryOutput(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            is_active=category.is_active,
-            created_at=category.created_at
-        )
-
-
 Output = TypeVar('Output', bound=CategoryOutput)
 
 

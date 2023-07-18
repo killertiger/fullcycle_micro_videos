@@ -172,8 +172,6 @@ class TestValidatorRulesUnit(unittest.TestCase):
         ValidatorRules(True, 'prop').required().boolean()
         ValidatorRules(False, 'prop').required().boolean()
 
-        self.assertTrue(True)
-
 
 class TestValidatorFieldsInterfaceUnit(unittest.TestCase):
     def test_throw_error_when_validate_method_not_implemented(self):
