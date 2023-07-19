@@ -57,19 +57,19 @@ class ValidatorFieldsInterface(ABC, Generic[PropsValidated]):
         raise NotImplementedError()
 
 
-class DRFValidator(ValidatorFieldsInterface[PropsValidated], ABC):
+class DRFValidator(ValidatorFieldsInterface[PropsValidated], ABC):  # pylint: disable=too-few-public-methods
     def validate(self, data: Serializer) -> bool:
         serializer = data
 
         if serializer.is_valid():
             self.validated_data = serializer.validated_data
             return True
-        else:
-            self.errors = {
-                field: [str(_error) for _error in _errors]
-                for field, _errors in serializer.errors.items()
-            }
-            return False
+
+        self.errors = {
+            field: [str(_error) for _error in _errors]
+            for field, _errors in serializer.errors.items()
+        }
+        return False
 
 
 class StrictCharField(CharField):
@@ -81,7 +81,7 @@ class StrictCharField(CharField):
 
 
 class StrictBooleanField(BooleanField):
-    def to_internal_value(self, data):
+    def to_internal_value(self, data):  # pylint: disable=inconsistent-return-statements
         try:
             if data is True:
                 return True

@@ -55,7 +55,7 @@ class TestUniqueEntityIdUnit(TestCase):
             UniqueEntityId,
             '_UniqueEntityId__validate',
             autospec=True,
-            side_effect=UniqueEntityId._UniqueEntityId__validate
+            side_effect=UniqueEntityId._UniqueEntityId__validate  # pylint: disable=protected-access
         ) as mock_validate:
             with self.assertRaises(InvalidUuidException) as assert_error:
                 UniqueEntityId('fake id')
@@ -70,7 +70,7 @@ class TestUniqueEntityIdUnit(TestCase):
             UniqueEntityId,
             '_UniqueEntityId__validate',
             autospec=True,
-            side_effect=UniqueEntityId._UniqueEntityId__validate
+            side_effect=UniqueEntityId._UniqueEntityId__validate  # pylint: disable=protected-access
         ) as mock_validate:
             value_object = UniqueEntityId(input_id)
             mock_validate.assert_called_once()
@@ -85,7 +85,7 @@ class TestUniqueEntityIdUnit(TestCase):
             UniqueEntityId,
             '_UniqueEntityId__validate',
             autospec=True,
-            side_effect=UniqueEntityId._UniqueEntityId__validate
+            side_effect=UniqueEntityId._UniqueEntityId__validate  # pylint: disable=protected-access
         ) as mock_validate:
             value_object = UniqueEntityId()
             uuid.UUID(value_object.id)

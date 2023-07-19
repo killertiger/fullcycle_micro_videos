@@ -53,6 +53,6 @@ class TestEntityUnit(unittest.TestCase):
     def test_set_method(self):
         entity = StubEntity(prop1='value 1', prop2='value 2')
 
-        entity._set('prop1', 'new value 1')
+        entity._set('prop1', 'new value 1')  # pylint: disable=protected-access
 
         self.assertEqual(entity.prop1, 'new value 1')

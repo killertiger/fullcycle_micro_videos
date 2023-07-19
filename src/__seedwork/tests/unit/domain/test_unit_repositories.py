@@ -1,7 +1,16 @@
 import unittest
 from dataclasses import dataclass
 from typing import Optional, List
-from __seedwork.domain.repositories import ET, Filter, InMemoryRepository, InMemorySearchableRepository, RepositoryInterface, SearchParams, SearchableRepositoryInterface, SearchResult
+from __seedwork.domain.repositories import (
+    ET,
+    Filter,
+    InMemoryRepository,
+    InMemorySearchableRepository,
+    RepositoryInterface,
+    SearchParams,
+    SearchableRepositoryInterface,
+    SearchResult
+)
 from __seedwork.domain.entities import Entity
 from __seedwork.domain.exceptions import NotFoundException
 from __seedwork.domain.value_objects import UniqueEntityId
@@ -10,7 +19,7 @@ from __seedwork.domain.value_objects import UniqueEntityId
 class TestRepositoryInterface(unittest.TestCase):
     def test_throw_error_when_methods_not_implemented(self):
         with self.assertRaises(TypeError) as assert_error:
-            RepositoryInterface()
+            RepositoryInterface()  # pylint: disable=abstract-class-instantiated
         self.assertEqual(assert_error.exception.args[0],
                          "Can't instantiate abstract class RepositoryInterface with abstract " +
                          "methods delete, find_all, find_by_id, insert, update"
@@ -52,7 +61,9 @@ class TestInMemoryRepository(unittest.TestCase):
         with self.assertRaises(NotFoundException) as assert_error:
             self.repo.find_by_id(unique_entity_id)
         self.assertEqual(
-            assert_error.exception.args[0], "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'")
+            assert_error.exception.args[0],
+            "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'"
+        )
 
     def test_find_by_id(self):
         entity = StubEntity(name='test', price=5)
@@ -127,9 +138,12 @@ class TestSearchableRepositoryInterface(unittest.TestCase):
 
     def test_throw_error_when_not_implemented(self):
         with self.assertRaises(TypeError) as assert_error:
-            SearchableRepositoryInterface()
-        self.assertEqual(assert_error.exception.args[0], "Can't instantiate abstract class SearchableRepositoryInterface " +
-                         "with abstract methods delete, find_all, find_by_id, insert, search, update")
+            SearchableRepositoryInterface()  # pylint: disable=abstract-class-instantiated
+        self.assertEqual(assert_error.exception.args[0],
+                         "Can't instantiate abstract class SearchableRepositoryInterface " +
+                         "with abstract methods delete, find_all, find_by_id, insert, " +
+                         "search, update"
+                         )
 
     def test_sortable_fields_prop(self):
         self.assertEqual(SearchableRepositoryInterface.sortable_fields, [])
@@ -359,7 +373,8 @@ class TestInMemorySearchableRepository(unittest.TestCase):
 
     def test__apply_filter(self):
         items = [StubEntity(name='test', price=5)]
-        result = self.repo._apply_filter(items, None)
+        result = self.repo._apply_filter(
+            items, None)  # pylint: disable=protected-access
         self.assertEqual(items, result)
 
         items = [
@@ -368,13 +383,16 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             StubEntity(name='fake', price=0),
         ]
 
-        result = self.repo._apply_filter(items, 'TEST')
+        result = self.repo._apply_filter(
+            items, 'TEST')  # pylint: disable=protected-access
         self.assertEqual([items[0], items[1]], result)
 
-        result = self.repo._apply_filter(items, '5')
+        result = self.repo._apply_filter(
+            items, '5')  # pylint: disable=protected-access
         self.assertEqual([items[0], items[1]], result)
 
-        result = self.repo._apply_filter(items, '0')
+        result = self.repo._apply_filter(
+            items, '0')  # pylint: disable=protected-access
         self.assertEqual([items[2]], result)
 
     def test__apply_sort(self):
@@ -384,21 +402,26 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             StubEntity(name='c', price=0),
         ]
 
-        result = self.repo._apply_sort(items, 'price', 'asc')
+        result = self.repo._apply_sort(
+            items, 'price', 'asc')  # pylint: disable=protected-access
         self.assertEqual(items, result)
 
-        result = self.repo._apply_sort(items, 'name', 'asc')
+        result = self.repo._apply_sort(
+            items, 'name', 'asc')  # pylint: disable=protected-access
         self.assertEqual([items[1], items[0], items[2]], result)
 
-        result = self.repo._apply_sort(items, 'name', 'desc')
+        result = self.repo._apply_sort(
+            items, 'name', 'desc')  # pylint: disable=protected-access
         self.assertEqual([items[2], items[0], items[1]], result)
 
         self.repo.sortable_fields.append('price')
-        result = self.repo._apply_sort(items, 'price', 'asc')
+        result = self.repo._apply_sort(
+            items, 'price', 'asc')  # pylint: disable=protected-access
         self.assertEqual([items[2], items[1], items[0]], result)
 
         self.repo.sortable_fields.append('price')
-        result = self.repo._apply_sort(items, 'price', 'desc')
+        result = self.repo._apply_sort(
+            items, 'price', 'desc')  # pylint: disable=protected-access
         self.assertEqual([items[0], items[1], items[2]], result)
 
     def test__apply_paginate(self):
@@ -410,16 +433,20 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             StubEntity(name='e', price=0),
         ]
 
-        result = self.repo._apply_paginate(items, 1, 2)
+        result = self.repo._apply_paginate(
+            items, 1, 2)  # pylint: disable=protected-access
         self.assertEqual([items[0], items[1]], result)
 
-        result = self.repo._apply_paginate(items, 2, 2)
+        result = self.repo._apply_paginate(
+            items, 2, 2)  # pylint: disable=protected-access
         self.assertEqual([items[2], items[3]], result)
 
-        result = self.repo._apply_paginate(items, 3, 2)
+        result = self.repo._apply_paginate(
+            items, 3, 2)  # pylint: disable=protected-access
         self.assertEqual([items[4]], result)
 
-        result = self.repo._apply_paginate(items, 4, 2)
+        result = self.repo._apply_paginate(
+            items, 4, 2)  # pylint: disable=protected-access
         self.assertEqual([], result)
 
     def test_search_when_params_is_empty(self):
@@ -580,11 +607,11 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             },
         ]
 
-        for index, item in enumerate(arrange_by_asc):
+        for index, item in enumerate(arrange_by_desc):
             result = self.repo.search(item['input'])
             self.assertEqual(result,
                              item['output'],
-                             f'The output using sort_dir asc on index {index} is different')
+                             f'The output using sort_dir desc on index {index} is different')
 
     def test_search_applying_filter_and_sort_and_paginate(self):
         items = [

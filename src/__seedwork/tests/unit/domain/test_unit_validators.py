@@ -3,7 +3,12 @@ from unittest.mock import patch, PropertyMock, MagicMock
 from dataclasses import fields
 from rest_framework.serializers import Serializer
 
-from __seedwork.domain.validators import ValidatorRules, ValidationException, ValidatorFieldsInterface, DRFValidator
+from __seedwork.domain.validators import (
+    ValidatorRules,
+    ValidationException,
+    ValidatorFieldsInterface,
+    DRFValidator
+)
 
 
 class TestValidatorRulesUnit(unittest.TestCase):
@@ -105,7 +110,7 @@ class TestValidatorRulesUnit(unittest.TestCase):
             with self.assertRaises(ValidationException, msg=msg) as assert_error:
                 ValidatorRules(item['value'], item['prop']).boolean()
 
-            self.assertEquals(
+            self.assertEqual(
                 'The prop must be a boolean',
                 assert_error.exception.args[0]
             )
@@ -176,8 +181,9 @@ class TestValidatorRulesUnit(unittest.TestCase):
 class TestValidatorFieldsInterfaceUnit(unittest.TestCase):
     def test_throw_error_when_validate_method_not_implemented(self):
         with self.assertRaises(TypeError) as assert_error:
-            ValidatorFieldsInterface()
-        self.assertEqual("Can't instantiate abstract class ValidatorFieldsInterface with abstract method validate",
+            ValidatorFieldsInterface()  # pylint: disable=abstract-class-instantiated
+        self.assertEqual("Can't instantiate abstract class ValidatorFieldsInterface " +
+                         "with abstract method validate",
                          assert_error.exception.args[0])
 
     def test_valid_fields(self):
@@ -199,7 +205,9 @@ class TestDRFValidatorUnit(unittest.TestCase):
         return_value={'field': ['value']},
         new_callable=PropertyMock
     )
-    def test_if_validated_data_is_set(self, mock_validated_data: PropertyMock, mock_is_valid: MagicMock):
+    def test_if_validated_data_is_set(self,
+                                      mock_validated_data: PropertyMock,  # pylint: disable=unused-argument
+                                      mock_is_valid: MagicMock):
         validator = DRFValidator()
         is_valid = validator.validate(Serializer())
         self.assertTrue(is_valid)
@@ -213,7 +221,9 @@ class TestDRFValidatorUnit(unittest.TestCase):
         return_value={'field': ['some error']},
         new_callable=PropertyMock
     )
-    def test_if_errors_is_set(self, mock_errors: PropertyMock, mock_is_valid: MagicMock):
+    def test_if_errors_is_set(self,
+                              mock_errors: PropertyMock,  # pylint: disable=unused-argument
+                              mock_is_valid: MagicMock):
         validator = DRFValidator()
         is_valid = validator.validate(Serializer())
         self.assertFalse(is_valid)

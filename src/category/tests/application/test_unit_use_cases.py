@@ -2,9 +2,11 @@ from datetime import datetime, timedelta
 from typing import Optional
 import unittest
 from unittest.mock import patch
-from __seedwork.application.dto import PaginationOutput, PaginationOutputMapper, SearchInput
 
+from __seedwork.application.dto import PaginationOutput, PaginationOutputMapper, SearchInput
 from __seedwork.application.use_cases import UseCase
+from __seedwork.domain.exceptions import NotFoundException
+
 from category.application.use_cases import (
     CreateCategoryUseCase,
     GetCategoryUseCase,
@@ -15,7 +17,6 @@ from category.application.use_cases import (
 from category.application.dto import CategoryOutput, CategoryOutputMapper
 from category.domain.repositories import CategoryInMemoryRepository, CategoryRepository
 from category.domain.entities import Category
-from __seedwork.domain.exceptions import NotFoundException
 
 
 class TestCreateCategoryUnitCaseUnit(unittest.TestCase):
@@ -40,12 +41,12 @@ class TestCreateCategoryUnitCaseUnit(unittest.TestCase):
             }
         )
 
-        description_field = CreateCategoryUseCase.Input.__dataclass_fields__[
+        description_field = CreateCategoryUseCase.Input.__dataclass_fields__[  # pylint: disable=no-member
             'description']
         self.assertEqual(description_field.default,
                          Category.get_field('description').default)
 
-        is_active_field = CreateCategoryUseCase.Input.__dataclass_fields__[
+        is_active_field = CreateCategoryUseCase.Input.__dataclass_fields__[  # pylint: disable=no-member
             'is_active']
         self.assertEqual(is_active_field.default,
                          Category.get_field('is_active').default)
@@ -59,7 +60,10 @@ class TestCreateCategoryUnitCaseUnit(unittest.TestCase):
         )
 
     def test_execute(self) -> None:
-        with patch.object(self.category_repo, 'insert', wraps=self.category_repo.insert) as spy_insert:
+        with patch.object(self.category_repo,
+                          'insert',
+                          wraps=self.category_repo.insert) as spy_insert:
+
             input_param = CreateCategoryUseCase.Input(name='Movie')
             output = self.use_case.execute(input_param)
             spy_insert.assert_called_once()
@@ -131,7 +135,10 @@ class TestGetCategoryUnitCaseUnit(unittest.TestCase):
         category = Category(name='Movie')
         self.category_repo.items = [category]
 
-        with patch.object(self.category_repo, 'find_by_id', wraps=self.category_repo.find_by_id) as spy_insert:
+        with patch.object(self.category_repo,
+                          'find_by_id',
+                          wraps=self.category_repo.find_by_id) as spy_insert:
+
             input_param = GetCategoryUseCase.Input(id=category.id)
             output = self.use_case.execute(input_param)
             spy_insert.assert_called_once()
@@ -175,7 +182,8 @@ class TestListCategoryUseCase(unittest.TestCase):
         }
 
         result = CategoryRepository.SearchResult(items=[], **default_props)
-        output = self.use_case._ListCategoriesUseCase__to_output(result)
+        output = self.use_case._ListCategoriesUseCase__to_output(
+            result)  # pylint: disable=protected-access
         self.assertEqual(output, ListCategoriesUseCase.Output(
             items=[],
             total=1,
@@ -186,7 +194,8 @@ class TestListCategoryUseCase(unittest.TestCase):
 
         result = CategoryRepository.SearchResult(
             items=[entity], **default_props)
-        output = self.use_case._ListCategoriesUseCase__to_output(result)
+        output = self.use_case._ListCategoriesUseCase__to_output(
+            result)  # pylint: disable=protected-access
         self.assertEqual(output,
                          PaginationOutputMapper.from_child(ListCategoriesUseCase.Output).to_output(
                              [CategoryOutputMapper.without_child().to_output(entity)],
@@ -200,7 +209,9 @@ class TestListCategoryUseCase(unittest.TestCase):
                      timedelta(seconds=200)),
         ]
 
-        with patch.object(self.category_repo, 'search', wraps=self.category_repo.search) as spy_search:
+        with patch.object(self.category_repo, 'search',
+                          wraps=self.category_repo.search) as spy_search:
+
             input_param = ListCategoriesUseCase.Input()
             output = self.use_case.execute(input_param)
 

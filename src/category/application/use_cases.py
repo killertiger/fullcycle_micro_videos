@@ -52,7 +52,7 @@ class GetCategoryUseCase(UseCase):
 
     @dataclass(slots=True, frozen=True)
     class Input:
-        id: str
+        id: str  # pylint: disable=invalid-name
 
     @dataclass(slots=True, frozen=True)
     class Output(CategoryOutput):
@@ -111,7 +111,7 @@ class UpdateCategoryUseCase(UseCase):
 
     @dataclass(slots=True, frozen=True)
     class Input:
-        id: str
+        id: str  # pylint: disable=invalid-name
         name: str
         description: Optional[str] = None
 
@@ -132,7 +132,7 @@ class DeleteCategoryUseCase(UseCase):
 
     @dataclass(slots=True, frozen=True)
     class Input:
-        id: str
+        id: str  # pylint: disable=invalid-name
 
     @dataclass(slots=True, frozen=True)
     class Output:

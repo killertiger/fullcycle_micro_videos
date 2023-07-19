@@ -28,7 +28,7 @@ class RepositoryInterface(Generic[ET], ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def delete(self, id) -> None:
+    def delete(self, entity_id) -> None:  # pylint: disable=invalid-name,redefined-builtin
         raise NotImplementedError()
 
 
@@ -100,11 +100,11 @@ class SearchParams(Generic[Filter]):
             return default
 
     def _get_dataclass_field(self, field_name):
-        return SearchParams.__dataclass_fields__[field_name]
+        return SearchParams.__dataclass_fields__[field_name]  # pylint: disable=no-member
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class SearchResult(Generic[ET, Filter]):
+class SearchResult(Generic[ET, Filter]):  # pylint: disable=too-many-instance-attributes
     items: List[ET]
     total: int
     current_page: int

@@ -1,7 +1,13 @@
 from typing import List, Optional
 import unittest
 
-from __seedwork.application.dto import Filter, Item, PaginationOutput, PaginationOutputMapper, SearchInput
+from __seedwork.application.dto import (
+    Filter,
+    Item,
+    PaginationOutput,
+    PaginationOutputMapper,
+    SearchInput
+)
 from __seedwork.domain.repositories import SearchResult
 
 
@@ -27,7 +33,7 @@ class TestPaginationOutput(unittest.TestCase):
         })
 
 
-class PaginationOutputChild(PaginationOutput):
+class PaginationOutputChild(PaginationOutput):  # pylint: disable=too-few-public-methods
     pass
 
 

@@ -11,7 +11,7 @@ class Entity(ABC):
         default_factory=UniqueEntityId)
 
     @property
-    def id(self):
+    def id(self):  # pylint: disable=invalid-name
         return str(self.unique_entity_id)
 
     def to_dict(self):
@@ -26,4 +26,4 @@ class Entity(ABC):
 
     @classmethod
     def get_field(cls, entity_field: str) -> Field:
-        return cls.__dataclass_fields__[entity_field]
+        return cls.__dataclass_fields__[entity_field]  # pylint: disable=no-member
