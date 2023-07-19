@@ -90,32 +90,31 @@ class ListCategoriesUseCase(UseCase):
 
 @dataclass(slots=True, frozen=True)
 class UpdateCategoryUseCase(UseCase):
-    
+
     category_repo: CategoryRepository
-    
+
     def execute(self, input_param: 'Input') -> 'Output':
         category = Category(
             unique_entity_id=input_param.id,
             name=input_param.name,
             description=input_param.description
         )
-        
+
         self.category_repo.update(category)
-        
+
         return self.__to_output(category)
-    
-    
+
     def __to_output(self, category: Category):
         return CategoryOutputMapper\
             .from_child(UpdateCategoryUseCase.Output)\
             .to_output(category)
-        
+
     @dataclass(slots=True, frozen=True)
     class Input:
         id: str
         name: str
         description: Optional[str] = None
-    
+
     @dataclass(slots=True, frozen=True)
     class Output(CategoryOutput):
         pass
@@ -123,18 +122,18 @@ class UpdateCategoryUseCase(UseCase):
 
 @dataclass(slots=True, frozen=True)
 class DeleteCategoryUseCase(UseCase):
-    
+
     category_repo: CategoryRepository
-    
+
     def execute(self, input_param: 'Input') -> 'Output':
         self.category_repo.delete(input_param.id)
-        
+
         return DeleteCategoryUseCase.Output()
-    
+
     @dataclass(slots=True, frozen=True)
     class Input:
         id: str
-    
+
     @dataclass(slots=True, frozen=True)
     class Output:
         pass

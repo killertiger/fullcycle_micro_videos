@@ -304,25 +304,25 @@ class TestListCategoryUseCase(unittest.TestCase):
 
 
 class TestUpdateCategoryUnitCaseUnit(unittest.TestCase):
-    
+
     use_case: UpdateCategoryUseCase
     category_repo: CategoryInMemoryRepository
-    
+
     def setUp(self) -> None:
         self.category_repo = CategoryInMemoryRepository()
         self.use_case = UpdateCategoryUseCase(self.category_repo)
         return super().setUp()
-    
+
     def test_if_instance_is_a_use_case(self):
         self.assertIsInstance(self.use_case, UseCase)
-        
+
     def test_input(self):
         self.assertEqual(UpdateCategoryUseCase.Input.__annotations__, {
             'id': str,
             'name': str,
             'description': Optional[str],
         })
-        
+
     def test_output(self):
         self.assertTrue(
             issubclass(
@@ -330,7 +330,7 @@ class TestUpdateCategoryUnitCaseUnit(unittest.TestCase):
                 CategoryOutput
             )
         )
-        
+
     def test_execute(self):
         category = Category(
             name='test 1',
@@ -338,12 +338,12 @@ class TestUpdateCategoryUnitCaseUnit(unittest.TestCase):
             is_active=True
         )
         self.category_repo.items = [category]
-        
+
         category_input = UpdateCategoryUseCase.Input(id=category.id,
-                                  name='new test 1',
-                                  description='new description')
+                                                     name='new test 1',
+                                                     description='new description')
         category_output = self.use_case.execute(category_input)
-        
+
         self.assertEqual(
             category_output,
             UpdateCategoryUseCase.Output(
@@ -362,11 +362,11 @@ class TestUpdateCategoryUnitCaseUnit(unittest.TestCase):
             is_active=True
         )
         self.category_repo.items = [category]
-        
+
         category_input = UpdateCategoryUseCase.Input(id='fake id',
-                                  name='new test 1',
-                                  description='new description')
-        
+                                                     name='new test 1',
+                                                     description='new description')
+
         with self.assertRaises(NotFoundException) as assert_error:
             self.use_case.execute(category_input)
         self.assertEqual(
@@ -376,47 +376,47 @@ class TestUpdateCategoryUnitCaseUnit(unittest.TestCase):
 
 
 class TestDeleteCategoryUseCaseUnit(unittest.TestCase):
-    
+
     use_case: DeleteCategoryUseCase
     category_repo: CategoryInMemoryRepository
-    
+
     def setUp(self) -> None:
         self.category_repo = CategoryInMemoryRepository()
         self.use_case = DeleteCategoryUseCase(self.category_repo)
-        
+
     def test_instance_use_case(self):
         self.assertIsInstance(self.use_case, DeleteCategoryUseCase)
-        
+
     def test_input(self):
         self.assertEqual(
             DeleteCategoryUseCase.Input.__annotations__,
             {'id': str}
         )
-        
+
     def test_output(self):
         self.assertEqual(
             DeleteCategoryUseCase.Output.__annotations__,
             {}
         )
-        
+
     def test_execute(self):
         category = Category(name='Movie 1', description='My description')
-        
+
         self.category_repo.items = [category]
-        
+
         input_param = DeleteCategoryUseCase.Input(category.id)
-        
+
         self.use_case.execute(input_param)
-        
+
         self.assertEqual(len(self.category_repo.items), 0)
-        
+
     def test_execute_throws_exception_when_category_not_found(self):
         category = Category(name='Movie 1', description='My description')
-        
+
         self.category_repo.items = [category]
-        
+
         input_param = DeleteCategoryUseCase.Input('fake id')
-        
+
         with self.assertRaises(NotFoundException) as assert_error:
             self.use_case.execute(input_param)
 
