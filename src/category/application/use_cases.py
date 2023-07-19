@@ -94,17 +94,19 @@ class UpdateCategoryUseCase(UseCase):
     category_repo: CategoryRepository
 
     def execute(self, input_param: 'Input') -> 'Output':
-        category = Category(
-            unique_entity_id=input_param.id,
-            name=input_param.name,
-            description=input_param.description
-        )
+        entity = self.category_repo.find_by_id(input_param.id)
+        entity.update(input_param.name, input_param.description)
 
-        self.category_repo.update(category)
+        if input_param.is_active is True:
+            entity.activate()
+        elif input_param.is_active is False:
+            entity.deactivate()
 
-        return self.__to_output(category)
+        self.category_repo.update(entity)
 
-    def __to_output(self, category: Category):
+        return self.__to_output(entity)
+
+    def __to_output(self, category: Category) -> 'Output':
         return CategoryOutputMapper\
             .from_child(UpdateCategoryUseCase.Output)\
             .to_output(category)
@@ -113,7 +115,8 @@ class UpdateCategoryUseCase(UseCase):
     class Input:
         id: str  # pylint: disable=invalid-name
         name: str
-        description: Optional[str] = None
+        description: Optional[str] = Category.get_field('description').default
+        is_active: Optional[bool] = Category.get_field('is_active').default
 
     @dataclass(slots=True, frozen=True)
     class Output(CategoryOutput):
@@ -125,18 +128,12 @@ class DeleteCategoryUseCase(UseCase):
 
     category_repo: CategoryRepository
 
-    def execute(self, input_param: 'Input') -> 'Output':
+    def execute(self, input_param: 'Input') -> None:
         self.category_repo.delete(input_param.id)
-
-        return DeleteCategoryUseCase.Output()
 
     @dataclass(slots=True, frozen=True)
     class Input:
         id: str  # pylint: disable=invalid-name
-
-    @dataclass(slots=True, frozen=True)
-    class Output:
-        pass
 
 # Learning:
 # SOLID - S = Single Responsibility

@@ -182,8 +182,8 @@ class TestListCategoryUseCase(unittest.TestCase):
         }
 
         result = CategoryRepository.SearchResult(items=[], **default_props)
-        output = self.use_case._ListCategoriesUseCase__to_output(
-            result)  # pylint: disable=protected-access
+        output = self.use_case._ListCategoriesUseCase__to_output(  # pylint: disable=protected-access
+            result)
         self.assertEqual(output, ListCategoriesUseCase.Output(
             items=[],
             total=1,
@@ -194,8 +194,8 @@ class TestListCategoryUseCase(unittest.TestCase):
 
         result = CategoryRepository.SearchResult(
             items=[entity], **default_props)
-        output = self.use_case._ListCategoriesUseCase__to_output(
-            result)  # pylint: disable=protected-access
+        output = self.use_case._ListCategoriesUseCase__to_output(  # pylint: disable=protected-access
+            result)
         self.assertEqual(output,
                          PaginationOutputMapper.from_child(ListCategoriesUseCase.Output).to_output(
                              [CategoryOutputMapper.without_child().to_output(entity)],
@@ -332,37 +332,24 @@ class TestUpdateCategoryUnitCaseUnit(unittest.TestCase):
             'id': str,
             'name': str,
             'description': Optional[str],
+            'is_active': Optional[bool]
         })
+
+        description_field = UpdateCategoryUseCase.Input.__dataclass_fields__[  # pylint: disable=no-member
+            'description']
+        self.assertEqual(description_field.default,
+                         Category.get_field('description').default)
+
+        is_active = UpdateCategoryUseCase.Input.__dataclass_fields__[  # pylint: disable=no-member
+            'is_active']
+        self.assertEqual(is_active.default,
+                         Category.get_field('is_active').default)
 
     def test_output(self):
         self.assertTrue(
             issubclass(
                 UpdateCategoryUseCase.Output,
                 CategoryOutput
-            )
-        )
-
-    def test_execute(self):
-        category = Category(
-            name='test 1',
-            description='any description',
-            is_active=True
-        )
-        self.category_repo.items = [category]
-
-        category_input = UpdateCategoryUseCase.Input(id=category.id,
-                                                     name='new test 1',
-                                                     description='new description')
-        category_output = self.use_case.execute(category_input)
-
-        self.assertEqual(
-            category_output,
-            UpdateCategoryUseCase.Output(
-                id=category.id,
-                name=category_input.name,
-                description=category_input.description,
-                is_active=category.is_active,
-                created_at=category_output.created_at
             )
         )
 
@@ -385,6 +372,91 @@ class TestUpdateCategoryUnitCaseUnit(unittest.TestCase):
             "Entity not found using ID 'fake id'"
         )
 
+    def test_execute(self):
+        category = Category(
+            name='test 1',
+            description='any description',
+            is_active=True
+        )
+        self.category_repo.items = [category]
+
+        with patch.object(self.category_repo,
+                          'update',
+                          wraps=self.category_repo.update) as spy_update:
+            category_input = UpdateCategoryUseCase.Input(id=category.id,
+                                                         name='new test 1',
+                                                         description='new description')
+            category_output = self.use_case.execute(category_input)
+
+            spy_update.assert_called_once()
+
+            self.assertEqual(
+                category_output,
+                UpdateCategoryUseCase.Output(
+                    id=category.id,
+                    name=category_input.name,
+                    description=category_input.description,
+                    is_active=category.is_active,
+                    created_at=category_output.created_at
+                )
+            )
+
+            arrange = [
+                {
+                    'input': {
+                        'id': category.id,
+                        'name': 'test 2',
+                        'description': 'description 2'
+                    },
+                    'expected': {
+                        'id': category.id,
+                        'name': 'test 2',
+                        'description': 'description 2',
+                        'is_active': True,
+                        'created_at': category.created_at
+                    },
+                },
+                {
+                    'input': {
+                        'id': category.id,
+                        'name': 'test 3',
+                        'description': 'description 3',
+                        'is_active': False
+
+                    },
+                    'expected': {
+                        'id': category.id,
+                        'name': 'test 3',
+                        'description': 'description 3',
+                        'is_active': False,
+                        'created_at': category.created_at
+                    },
+                },
+                {
+                    'input': {
+                        'id': category.id,
+                        'name': 'test 4',
+                        'is_active': True
+
+                    },
+                    'expected': {
+                        'id': category.id,
+                        'name': 'test 4',
+                        'description': None,
+                        'is_active': True,
+                        'created_at': category.created_at
+                    },
+                },
+            ]
+
+            for item in arrange:
+                input_param = UpdateCategoryUseCase.Input(**item['input'])
+                category_output = self.use_case.execute(input_param)
+                self.assertEqual(category_output,
+                                 UpdateCategoryUseCase.Output(
+                                     **item['expected'])
+                                 )
+
 
 class TestDeleteCategoryUseCaseUnit(unittest.TestCase):
 
@@ -404,23 +476,6 @@ class TestDeleteCategoryUseCaseUnit(unittest.TestCase):
             {'id': str}
         )
 
-    def test_output(self):
-        self.assertEqual(
-            DeleteCategoryUseCase.Output.__annotations__,
-            {}
-        )
-
-    def test_execute(self):
-        category = Category(name='Movie 1', description='My description')
-
-        self.category_repo.items = [category]
-
-        input_param = DeleteCategoryUseCase.Input(category.id)
-
-        self.use_case.execute(input_param)
-
-        self.assertEqual(len(self.category_repo.items), 0)
-
     def test_execute_throws_exception_when_category_not_found(self):
         category = Category(name='Movie 1', description='My description')
 
@@ -433,3 +488,17 @@ class TestDeleteCategoryUseCaseUnit(unittest.TestCase):
 
         self.assertEqual(assert_error.exception.args[0],
                          "Entity not found using ID 'fake id'")
+
+    def test_execute(self):
+        category = Category(name='Movie 1', description='My description')
+
+        self.category_repo.items = [category]
+
+        input_param = DeleteCategoryUseCase.Input(category.id)
+
+        with patch.object(self.category_repo, 'delete',
+                          wraps=self.category_repo.delete) as spy_delete:
+            self.use_case.execute(input_param)
+
+            spy_delete.assert_called_once()
+            self.assertCountEqual(self.category_repo.items, [])

@@ -373,8 +373,8 @@ class TestInMemorySearchableRepository(unittest.TestCase):
 
     def test__apply_filter(self):
         items = [StubEntity(name='test', price=5)]
-        result = self.repo._apply_filter(
-            items, None)  # pylint: disable=protected-access
+        result = self.repo._apply_filter(  # pylint: disable=protected-access
+            items, None)
         self.assertEqual(items, result)
 
         items = [
@@ -383,16 +383,16 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             StubEntity(name='fake', price=0),
         ]
 
-        result = self.repo._apply_filter(
-            items, 'TEST')  # pylint: disable=protected-access
+        result = self.repo._apply_filter(  # pylint: disable=protected-access
+            items, 'TEST')
         self.assertEqual([items[0], items[1]], result)
 
-        result = self.repo._apply_filter(
-            items, '5')  # pylint: disable=protected-access
+        result = self.repo._apply_filter(  # pylint: disable=protected-access
+            items, '5')
         self.assertEqual([items[0], items[1]], result)
 
-        result = self.repo._apply_filter(
-            items, '0')  # pylint: disable=protected-access
+        result = self.repo._apply_filter(  # pylint: disable=protected-access
+            items, '0')
         self.assertEqual([items[2]], result)
 
     def test__apply_sort(self):
@@ -402,26 +402,26 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             StubEntity(name='c', price=0),
         ]
 
-        result = self.repo._apply_sort(
-            items, 'price', 'asc')  # pylint: disable=protected-access
+        result = self.repo._apply_sort(  # pylint: disable=protected-access
+            items, 'price', 'asc')
         self.assertEqual(items, result)
 
-        result = self.repo._apply_sort(
-            items, 'name', 'asc')  # pylint: disable=protected-access
+        result = self.repo._apply_sort(  # pylint: disable=protected-access
+            items, 'name', 'asc')
         self.assertEqual([items[1], items[0], items[2]], result)
 
-        result = self.repo._apply_sort(
-            items, 'name', 'desc')  # pylint: disable=protected-access
+        result = self.repo._apply_sort(  # pylint: disable=protected-access
+            items, 'name', 'desc')
         self.assertEqual([items[2], items[0], items[1]], result)
 
         self.repo.sortable_fields.append('price')
-        result = self.repo._apply_sort(
-            items, 'price', 'asc')  # pylint: disable=protected-access
+        result = self.repo._apply_sort(  # pylint: disable=protected-access
+            items, 'price', 'asc')
         self.assertEqual([items[2], items[1], items[0]], result)
 
         self.repo.sortable_fields.append('price')
-        result = self.repo._apply_sort(
-            items, 'price', 'desc')  # pylint: disable=protected-access
+        result = self.repo._apply_sort(  # pylint: disable=protected-access
+            items, 'price', 'desc')
         self.assertEqual([items[0], items[1], items[2]], result)
 
     def test__apply_paginate(self):
@@ -433,20 +433,20 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             StubEntity(name='e', price=0),
         ]
 
-        result = self.repo._apply_paginate(
-            items, 1, 2)  # pylint: disable=protected-access
+        result = self.repo._apply_paginate(  # pylint: disable=protected-access
+            items, 1, 2)
         self.assertEqual([items[0], items[1]], result)
 
-        result = self.repo._apply_paginate(
-            items, 2, 2)  # pylint: disable=protected-access
+        result = self.repo._apply_paginate(  # pylint: disable=protected-access
+            items, 2, 2)
         self.assertEqual([items[2], items[3]], result)
 
-        result = self.repo._apply_paginate(
-            items, 3, 2)  # pylint: disable=protected-access
+        result = self.repo._apply_paginate(  # pylint: disable=protected-access
+            items, 3, 2)
         self.assertEqual([items[4]], result)
 
-        result = self.repo._apply_paginate(
-            items, 4, 2)  # pylint: disable=protected-access
+        result = self.repo._apply_paginate(  # pylint: disable=protected-access
+            items, 4, 2)
         self.assertEqual([], result)
 
     def test_search_when_params_is_empty(self):
