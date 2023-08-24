@@ -1,8 +1,8 @@
 import unittest
 from datetime import datetime
-from category.domain.entities import Category
+from core.category.domain.entities import Category
 
-from category.domain.repositories import CategoryInMemoryRepository, CategoryRepository
+from core.category.domain.repositories import CategoryInMemoryRepository, CategoryRepository
 
 
 class TestCategoryInMemoryRepository(unittest.TestCase):

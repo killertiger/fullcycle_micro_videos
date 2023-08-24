@@ -1,7 +1,7 @@
 from typing import Dict
 from rest_framework import serializers
 
-from __seedwork.domain.validators import DRFValidator, StrictCharField, StrictBooleanField
+from core.__seedwork.domain.validators import DRFValidator, StrictCharField, StrictBooleanField
 
 
 class CategoryRules(serializers.Serializer):  # pylint: disable=abstract-method

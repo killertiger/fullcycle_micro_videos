@@ -1,6 +1,6 @@
 import unittest
-from category.domain.entities import Category
-from __seedwork.domain.exceptions import EntityValidationException
+from core.category.domain.entities import Category
+from core.__seedwork.domain.exceptions import EntityValidationException
 
 
 class TestCategoryIntegration(unittest.TestCase):

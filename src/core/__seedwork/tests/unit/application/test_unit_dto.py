@@ -1,14 +1,14 @@
 from typing import List, Optional
 import unittest
 
-from __seedwork.application.dto import (
+from core.__seedwork.application.dto import (
     Filter,
     Item,
     PaginationOutput,
     PaginationOutputMapper,
     SearchInput
 )
-from __seedwork.domain.repositories import SearchResult
+from core.__seedwork.domain.repositories import SearchResult
 
 
 class TestSearchInput(unittest.TestCase):

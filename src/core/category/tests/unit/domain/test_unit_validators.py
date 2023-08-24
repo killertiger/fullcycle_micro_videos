@@ -1,6 +1,6 @@
 import unittest
 
-from category.domain.validators import CategoryValidator, CategoryValidatorFactory
+from core.category.domain.validators import CategoryValidator, CategoryValidatorFactory
 
 
 class TestCategoryValidatorUnit(unittest.TestCase):

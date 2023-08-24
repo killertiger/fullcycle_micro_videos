@@ -1,13 +1,13 @@
 from abc import ABC
 from typing import List, Any
 
-from __seedwork.domain.repositories import (
+from core.__seedwork.domain.repositories import (
     InMemorySearchableRepository,
     SearchableRepositoryInterface,
     SearchParams as DefaultSearchParams,
     SearchResult as DefaultSearchResult
 )
-from category.domain.entities import Category
+from core.category.domain.entities import Category
 
 
 class _SearchParams(DefaultSearchParams):  # pylint: disable=too-few-public-methods

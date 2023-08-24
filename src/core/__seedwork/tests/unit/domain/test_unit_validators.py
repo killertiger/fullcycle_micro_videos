@@ -3,7 +3,7 @@ from unittest.mock import patch, PropertyMock, MagicMock
 from dataclasses import fields
 from rest_framework.serializers import Serializer
 
-from __seedwork.domain.validators import (
+from core.__seedwork.domain.validators import (
     ValidatorRules,
     ValidationException,
     ValidatorFieldsInterface,

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional, TypeVar, Generic, List
-from __seedwork.domain.repositories import SearchResult
+from core.__seedwork.domain.repositories import SearchResult
 
 Filter = TypeVar('Filter')
 

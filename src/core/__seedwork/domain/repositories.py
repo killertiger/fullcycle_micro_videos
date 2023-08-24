@@ -2,9 +2,9 @@ import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar, List, Optional, Any
-from __seedwork.domain.value_objects import UniqueEntityId
-from __seedwork.domain.entities import Entity
-from __seedwork.domain.exceptions import NotFoundException
+from core.__seedwork.domain.value_objects import UniqueEntityId
+from core.__seedwork.domain.entities import Entity
+from core.__seedwork.domain.exceptions import NotFoundException
 
 ET = TypeVar('ET', bound=Entity)
 

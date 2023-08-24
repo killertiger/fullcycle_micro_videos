@@ -40,8 +40,8 @@
 				"vscode-icons-team.vscode-icons",
 				"ms-python.black-formatter"
 			],
-			"settings": {
-				"terminal.integrated.defaultProfile.linux": "zsh"
+			 "settings": {
+			 	"terminal.integrated.defaultProfile.linux": "zsh"
 			}
 		}
 	},

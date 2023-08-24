@@ -22,8 +22,8 @@ dev = [
 ]
 
 [tool.pdm.scripts]
-pep8 = "python -m autopep8 --in-place --recursive ./src"
-pylint="python -m pylint ./src"
+pep8 = "autopep8 --in-place --recursive ./src"
+pylint="pylint ./src"
 test = "pytest --ignore __pypackages__"
 test_cov = "pdm run test --cov ./src --cov-fail-under 80"
 test_cov_html = "pdm run test_cov --cov-report html:./__coverage"

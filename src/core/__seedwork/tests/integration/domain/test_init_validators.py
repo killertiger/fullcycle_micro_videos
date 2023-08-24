@@ -1,6 +1,6 @@
 import unittest
 from rest_framework import serializers
-from __seedwork.domain.validators import DRFValidator, StrictCharField, StrictBooleanField
+from core.__seedwork.domain.validators import DRFValidator, StrictCharField, StrictBooleanField
 
 
 class StubSerializer(serializers.Serializer):  # pylint: disable=abstract-method

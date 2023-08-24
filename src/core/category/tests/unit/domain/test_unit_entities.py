@@ -3,7 +3,7 @@ from dataclasses import FrozenInstanceError, is_dataclass
 from unittest.mock import patch
 import unittest
 
-from category.domain.entities import Category
+from core.category.domain.entities import Category
 
 
 class TestCategoryUnit(unittest.TestCase):
