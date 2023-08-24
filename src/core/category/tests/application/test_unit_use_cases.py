@@ -15,7 +15,8 @@ from core.category.application.use_cases import (
     DeleteCategoryUseCase
 )
 from core.category.application.dto import CategoryOutput, CategoryOutputMapper
-from core.category.domain.repositories import CategoryInMemoryRepository, CategoryRepository
+from core.category.domain.repositories import CategoryRepository
+from core.category.infra.in_memory.repositories import CategoryInMemoryRepository
 from core.category.domain.entities import Category
 
 
