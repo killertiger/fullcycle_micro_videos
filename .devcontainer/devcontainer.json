@@ -38,7 +38,8 @@
 				"johnpapa.vscode-peacock",
 				"ms-azuretools.vscode-docker",
 				"vscode-icons-team.vscode-icons",
-				"ms-python.black-formatter"
+				"ms-python.black-formatter",
+				"humao.rest-client"
 			],
 			 "settings": {
 			 	"terminal.integrated.defaultProfile.linux": "zsh"
