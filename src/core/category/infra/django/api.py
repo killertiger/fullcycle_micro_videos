@@ -25,10 +25,3 @@ class CategoryResource(APIView):
         input_param = ListCategoriesUseCase.Input(**request.query_params.dict())
         output = self.list_use_case().execute(input_param)
         return Response(asdict(output))
-
-# @api_view(['POST'])
-# def hello_world(request: Request):
-#     create_use_case = CreateCategoryUseCase(CategoryInMemoryRepository())
-#     input_param = CreateCategoryUseCase.Input(name=request.data['name'])
-#     output = create_use_case.execute(input_param)
-#     return Response(asdict(output))
