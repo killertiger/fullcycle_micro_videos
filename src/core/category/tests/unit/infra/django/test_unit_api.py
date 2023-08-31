@@ -1,12 +1,13 @@
 from datetime import datetime
 import unittest
 from unittest import mock
+from rest_framework.test import APIRequestFactory
+from rest_framework.request import Request
 from core.category.application.use_cases import (
     CreateCategoryUseCase
 )
 from core.category.infra.django.api import CategoryResource
-from rest_framework.test import APIRequestFactory
-from rest_framework.request import Request
+
 
 class TestCategoryResourceUnit(unittest.TestCase):
     def test_post_method(self):
