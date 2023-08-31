@@ -1,47 +1,33 @@
-"""
-URL configuration for django_app project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from core.category.application.use_cases import CreateCategoryUseCase
 
 from core.category.infra.django.api import CategoryResource
 from core.category.infra.in_memory.repositories import CategoryInMemoryRepository
+from django_app import container
 
 
-class CategoryInMemoryRepositoryFactory:
+# class CategoryInMemoryRepositoryFactory:
     
-    repo: CategoryInMemoryRepository = None
+#     repo: CategoryInMemoryRepository = None
     
-    @classmethod
-    def create(cls):
-        if not cls.repo:
-            cls.repo = CategoryInMemoryRepository()
-        return cls.repo
+#     @classmethod
+#     def create(cls):
+#         if not cls.repo:
+#             cls.repo = CategoryInMemoryRepository()
+#         return cls.repo
 
-class CreateCategoryUseCaseFactory:
-    @staticmethod
-    def create():
-        repo = CategoryInMemoryRepositoryFactory.create()
-        return CreateCategoryUseCase(repo)
+# class CreateCategoryUseCaseFactory:
+#     @staticmethod
+#     def create():
+#         repo = CategoryInMemoryRepositoryFactory.create()
+#         return CreateCategoryUseCase(repo)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('categories/', CategoryResource.as_view(
-                create_use_case=CreateCategoryUseCaseFactory.create()
+                create_use_case = container.use_case_category_create_category,
+                list_use_case = container.use_case_category_list_category,
             )
          ),
 ]

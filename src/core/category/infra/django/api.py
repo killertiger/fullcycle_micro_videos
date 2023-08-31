@@ -1,30 +1,29 @@
+from typing import Callable
 from dataclasses import asdict, dataclass
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from core.category.application.use_cases import CreateCategoryUseCase, ListCategoriesUseCase
-from core.category.infra.in_memory.repositories import CategoryInMemoryRepository
-
+from core.category.application.use_cases import (CreateCategoryUseCase, 
+                                                 ListCategoriesUseCase
+                                                 )
 
 
 @dataclass(slots=True)
 class CategoryResource(APIView):
     
-    # repo = CategoryInMemoryRepository()
-    create_use_case: CreateCategoryUseCase
+    create_use_case: Callable[[], CreateCategoryUseCase]
+    list_use_case: Callable[[], ListCategoriesUseCase]
     
     def post(self, request: Request):
-        # create_use_case = CreateCategoryUseCaseFactory.create()
         print(request.data)
         input_param = CreateCategoryUseCase.Input(name=request.data['name'])
-        output = self.create_use_case.execute(input_param)
+        output = self.create_use_case().execute(input_param)
         return Response(asdict(output))
     
     def get(self, request: Request):
-        list_use_case = ListCategoriesUseCase(self.repo)
         print(request.data)
-        input_param = ListCategoriesUseCase.Input()
-        output = list_use_case.execute(input_param)
+        input_param = ListCategoriesUseCase.Input(**request.query_params.dict())
+        output = self.list_use_case().execute(input_param)
         return Response(asdict(output))
 
 # @api_view(['POST'])
