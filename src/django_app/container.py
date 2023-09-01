@@ -4,6 +4,7 @@ from core.category.application.use_cases import (
     CreateCategoryUseCase,
     ListCategoriesUseCase,
     GetCategoryUseCase,
+    UpdateCategoryUseCase,
 )
 
 
@@ -18,4 +19,7 @@ class Container(containers.DeclarativeContainer):
     )
     use_case_category_get_category = providers.Singleton(
         GetCategoryUseCase, category_repo=repository_category_in_memory
+    )
+    use_case_category_update_category = providers.Singleton(
+        UpdateCategoryUseCase, category_repo=repository_category_in_memory
     )

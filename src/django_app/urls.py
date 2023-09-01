@@ -10,6 +10,7 @@ def __init_category_resource():
         "create_use_case": container.use_case_category_create_category,
         "list_use_case": container.use_case_category_list_categories,
         "get_use_case": container.use_case_category_get_category,
+        "update_use_case": container.use_case_category_update_category,
     }
 
 

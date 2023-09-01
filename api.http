@@ -10,3 +10,14 @@ Content-Type: application/json
 {
     "name": "Movie"
 }
+
+###
+
+PUT http://localhost:8000/categories/87578bfd-55fb-4a67-82a8-fb691d9e64ff/
+Content-Type: application/json
+
+{
+  "name": "Movie2",
+  "description": null,
+  "is_active": false
+}
