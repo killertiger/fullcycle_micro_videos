@@ -13,7 +13,7 @@ Content-Type: application/json
 
 ###
 
-PUT http://localhost:8000/categories/87578bfd-55fb-4a67-82a8-fb691d9e64ff/
+PUT http://localhost:8000/categories/f325c276-4d9e-47a2-a4ce-c151bd0e0074/
 Content-Type: application/json
 
 {
@@ -21,3 +21,8 @@ Content-Type: application/json
   "description": null,
   "is_active": false
 }
+
+###
+
+DELETE http://localhost:8000/categories/7af68f5b-772a-472c-b36e-a68ca225eab3/
+Content-Type: application/json

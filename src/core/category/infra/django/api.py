@@ -7,7 +7,8 @@ from rest_framework import status as http_status
 from core.category.application.use_cases import (CreateCategoryUseCase, 
                                                  ListCategoriesUseCase,
                                                  GetCategoryUseCase,
-                                                 UpdateCategoryUseCase
+                                                 UpdateCategoryUseCase,
+                                                 DeleteCategoryUseCase
                                                  )
 
 
@@ -18,6 +19,7 @@ class CategoryResource(APIView):
     list_use_case: Callable[[], ListCategoriesUseCase]
     get_use_case: Callable[[], GetCategoryUseCase]
     update_use_case: Callable[[], UpdateCategoryUseCase]
+    delete_use_case: Callable[[], DeleteCategoryUseCase]
     
     def post(self, request: Request):
         print(request.data)
@@ -43,3 +45,9 @@ class CategoryResource(APIView):
         output = self.update_use_case().execute(input_param)
         
         return Response(asdict(output))
+    
+    def delete(self, _request: Request, id: str):
+        input_param = DeleteCategoryUseCase.Input(id=id)
+        self.delete_use_case().execute(input_param)
+        
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
