@@ -8,13 +8,19 @@ from core.category.application.use_cases import (
     CreateCategoryUseCase,
     ListCategoriesUseCase,
     GetCategoryUseCase,
+    UpdateCategoryUseCase,
 )
 from core.category.infra.django.api import CategoryResource
 
 
 class TestCategoryResourceUnit(unittest.TestCase):
     def __init_all_none(self):
-        return {"list_use_case": None, "create_use_case": None, "get_use_case": None}
+        return {
+            "list_use_case": None,
+            "create_use_case": None,
+            "get_use_case": None,
+            "update_use_case": None,
+        }
 
     def test_post_method(self):
         send_data = {"name": "fake name"}
@@ -149,8 +155,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
                 "created_at": mock_get_use_case.execute.return_value.created_at,
             },
         )
-        
-    
+
     def test_if_get_invoke_get_object_2(self):
         resource = CategoryResource(**self.__init_all_none())
         resource.get_object = mock.Mock()
@@ -188,3 +193,43 @@ class TestCategoryResourceUnit(unittest.TestCase):
                 "created_at": mock_get_use_case.execute.return_value.created_at,
             },
         )
+
+    def test_update_method(self):
+        send_data = {"id": "fc98cf57-4615-4b0a-b5eb-373870ca27ce", "name": "Movie"}
+
+        mock_update_use_case = mock.Mock(UpdateCategoryUseCase)
+
+        mock_update_use_case.execute.return_value = UpdateCategoryUseCase.Output(
+            id=send_data["id"],
+            name=send_data["name"],
+            description=None,
+            is_active=True,
+            created_at=datetime.now(),
+        )
+
+        resource = CategoryResource(
+            **{
+                **self.__init_all_none(),
+                "update_use_case": lambda: mock_update_use_case,
+            }
+        )
+
+        _request = APIRequestFactory().put("/", send_data)
+        request = Request(_request)
+        request._full_data = send_data
+
+        response = resource.put(request, send_data["id"])
+        
+        mock_update_use_case.execute.assert_called_with(UpdateCategoryUseCase.Input(
+            id=send_data["id"],
+            name=send_data["name"],
+        ))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
+            "id": send_data["id"],
+            "name": send_data["name"],
+            "description": None,
+            'is_active': True,
+            'created_at': mock_update_use_case.execute.return_value.created_at
+        })
