@@ -9,6 +9,7 @@ from core.category.application.use_cases import (
     ListCategoriesUseCase,
     GetCategoryUseCase,
     UpdateCategoryUseCase,
+    DeleteCategoryUseCase,
 )
 from core.category.infra.django.api import CategoryResource
 
@@ -20,6 +21,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
             "create_use_case": None,
             "get_use_case": None,
             "update_use_case": None,
+            "delete_use_case": None,
         }
 
     def test_post_method(self):
@@ -219,17 +221,43 @@ class TestCategoryResourceUnit(unittest.TestCase):
         request._full_data = send_data
 
         response = resource.put(request, send_data["id"])
-        
-        mock_update_use_case.execute.assert_called_with(UpdateCategoryUseCase.Input(
-            id=send_data["id"],
-            name=send_data["name"],
-        ))
-        
+
+        mock_update_use_case.execute.assert_called_with(
+            UpdateCategoryUseCase.Input(
+                id=send_data["id"],
+                name=send_data["name"],
+            )
+        )
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, {
-            "id": send_data["id"],
-            "name": send_data["name"],
-            "description": None,
-            'is_active': True,
-            'created_at': mock_update_use_case.execute.return_value.created_at
-        })
+        self.assertEqual(
+            response.data,
+            {
+                "id": send_data["id"],
+                "name": send_data["name"],
+                "description": None,
+                "is_active": True,
+                "created_at": mock_update_use_case.execute.return_value.created_at,
+            },
+        )
+
+    def test_delete_method(self):
+        mock_delete_use_case = mock.Mock(DeleteCategoryUseCase)
+
+        resource = CategoryResource(
+            **{
+                **self.__init_all_none(),
+                "delete_use_case": lambda: mock_delete_use_case,
+            }
+        )
+
+        _request = APIRequestFactory().delete("/")
+        request = Request(_request)
+
+        response = resource.delete(request, "fc98cf57-4615-4b0a-b5eb-373870ca27ce")
+
+        mock_delete_use_case.execute.assert_called_with(
+            DeleteCategoryUseCase.Input(id="fc98cf57-4615-4b0a-b5eb-373870ca27ce")
+        )
+
+        self.assertEqual(response.status_code, 204)
