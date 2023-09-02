@@ -2,11 +2,12 @@ from typing import List
 from core.__seedwork.domain.value_objects import UniqueEntityId
 from core.category.domain.entities import Category
 from core.category.domain.repositories import CategoryRepository
+from core.category.infra.django_app.models import CategoryModel
 
 
 class CategoryDjangoRepository(CategoryRepository):
     def insert(self, entity: Category) -> None:
-        raise NotImplementedError()
+        CategoryModel.objects.create(**entity.to_dict())
 
     def find_by_id(self, entity_id: str | UniqueEntityId) -> Category:
         raise NotImplementedError()
