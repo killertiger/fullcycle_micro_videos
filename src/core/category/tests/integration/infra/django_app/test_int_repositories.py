@@ -91,13 +91,50 @@ class TestCategoryDjangoRepositoryInt(unittest.TestCase):
     def test_update(self):
         category = Category(name='Movie')
         self.repo.insert(category)
-        
+
         category.update(name='Movie updated', description='description updated')
         self.repo.update(category)
-        
+
         model = CategoryModel.objects.get(pk=category.id)
         self.assertEqual(str(model.id), category.id)
         self.assertEqual(model.name, 'Movie updated')
         self.assertEqual(model.description, 'description updated')
         self.assertTrue(model.is_active)
         self.assertEqual(model.created_at, category.created_at)
+
+    def test_throw_not_found_exception_in_delete(self):
+        with self.assertRaises(NotFoundException) as assert_error:
+            self.repo.delete('fake id')
+        self.assertEqual(
+            assert_error.exception.args[0], "Entity not found using ID 'fake id'"
+        )
+        
+        with self.assertRaises(NotFoundException) as assert_error:
+            self.repo.delete('2a181815-db58-43b1-81aa-597e69e66eb8')
+        self.assertEqual(
+            assert_error.exception.args[0], "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'"
+        )
+        
+        unique_entity_id = UniqueEntityId('2a181815-db58-43b1-81aa-597e69e66eb8')
+        with self.assertRaises(NotFoundException) as assert_error:
+            self.repo.delete(unique_entity_id)
+        self.assertEqual(
+            assert_error.exception.args[0], "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'"
+        )
+        
+    def test_delete(self):
+        category = Category(name='Movie')
+        self.repo.insert(category)
+        
+        self.repo.delete(category.id)
+        
+        with self.assertRaises(NotFoundException):
+            self.repo.find_by_id(category.id)
+        
+        category = Category(name='Movie')
+        self.repo.insert(category)
+        
+        self.repo.delete(category.unique_entity_id)
+        
+        with self.assertRaises(NotFoundException):
+            self.repo.find_by_id(category.id)
