@@ -11,7 +11,6 @@ dependencies = [
     "djangorestframework>=3.14.0",
     "django-extensions>=3.2.3",
     "dependency-injector>=4.41.0",
-    "pytest-django>=4.5.2",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -22,6 +21,7 @@ dev = [
     "pylint>=2.17.4",
     "pytest>=7.3.1",
     "pytest-cov>=4.1.0",
+    "pytest-django>=4.5.2",
 ]
 
 [tool.pdm.scripts]
