@@ -79,3 +79,4 @@ class TestCategoryDjangoRepositoryInt(unittest.TestCase):
         self.assertEqual(len(categories), 2)
         self.assertEqual(categories[0], CategoryModelMapper.to_entity(models[0]))
         self.assertEqual(categories[1], CategoryModelMapper.to_entity(models[1]))
+        

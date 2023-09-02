@@ -25,7 +25,9 @@ class CategoryDjangoRepository(CategoryRepository):
         ]
 
     def update(self, entity: Category) -> None:
-        raise NotImplementedError()
+        self._get(entity.id)
+        model = CategoryModelMapper.to_model(entity)
+        model.save()
 
     def delete(self, entity_id: str | UniqueEntityId) -> None:
         raise NotImplementedError()
