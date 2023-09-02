@@ -138,3 +138,6 @@ class TestCategoryDjangoRepositoryInt(unittest.TestCase):
         
         with self.assertRaises(NotFoundException):
             self.repo.find_by_id(category.id)
+            
+    def test_search(self):
+        pass
