@@ -1,12 +1,16 @@
+import datetime
 import unittest
-from core.category.infra.django_app.mapper import CategoryModelMapper
+from django.utils import timezone
+from model_bakery.utils import seq
 import pytest
 from model_bakery import baker
 from core.__seedwork.domain.exceptions import NotFoundException
 from core.__seedwork.domain.value_objects import UniqueEntityId
+from core.category.infra.django_app.mapper import CategoryModelMapper
 from core.category.infra.django_app.repositories import CategoryDjangoRepository
 from core.category.infra.django_app.models import CategoryModel
 from core.category.domain.entities import Category
+from core.category.domain.repositories import CategoryRepository
 
 
 @pytest.mark.django_db
@@ -108,36 +112,58 @@ class TestCategoryDjangoRepositoryInt(unittest.TestCase):
         self.assertEqual(
             assert_error.exception.args[0], "Entity not found using ID 'fake id'"
         )
-        
+
         with self.assertRaises(NotFoundException) as assert_error:
             self.repo.delete('2a181815-db58-43b1-81aa-597e69e66eb8')
         self.assertEqual(
-            assert_error.exception.args[0], "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'"
+            assert_error.exception.args[0],
+            "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'",
         )
-        
+
         unique_entity_id = UniqueEntityId('2a181815-db58-43b1-81aa-597e69e66eb8')
         with self.assertRaises(NotFoundException) as assert_error:
             self.repo.delete(unique_entity_id)
         self.assertEqual(
-            assert_error.exception.args[0], "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'"
+            assert_error.exception.args[0],
+            "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'",
         )
-        
+
     def test_delete(self):
         category = Category(name='Movie')
         self.repo.insert(category)
-        
+
         self.repo.delete(category.id)
-        
+
         with self.assertRaises(NotFoundException):
             self.repo.find_by_id(category.id)
-        
+
         category = Category(name='Movie')
         self.repo.insert(category)
-        
+
         self.repo.delete(category.unique_entity_id)
-        
+
         with self.assertRaises(NotFoundException):
             self.repo.find_by_id(category.id)
-            
-    def test_search(self):
-        pass
+
+    def test_search_when_params_is_empty(self):
+        models = baker.make(
+            CategoryModel,
+            _quantity=16,
+            created_at=seq(datetime.datetime.now(), datetime.timedelta(days=1)),
+        )
+        models.reverse()
+
+        search_result = self.repo.search(CategoryRepository.SearchParams())
+        self.assertIsInstance(search_result, CategoryRepository.SearchResult)
+        self.assertEqual(
+            search_result,
+            CategoryRepository.SearchResult(
+                items=[CategoryModelMapper.to_entity(model) for model in models[:15]],
+                total=16,
+                current_page=1,
+                per_page=15,
+                sort=None,
+                sort_dir=None,
+                filter=None,
+            ),
+        )
