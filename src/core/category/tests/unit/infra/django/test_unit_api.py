@@ -11,7 +11,7 @@ from core.category.application.use_cases import (
     UpdateCategoryUseCase,
     DeleteCategoryUseCase,
 )
-from core.category.infra.django.api import CategoryResource
+from core.category.infra.django_app.api import CategoryResource
 
 
 class TestCategoryResourceUnit(unittest.TestCase):

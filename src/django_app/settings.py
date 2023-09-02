@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions', # help commands such as show_urls
-    'core.category.infra.django',
+    'core.category.infra.django_app',
 ]
 
 MIDDLEWARE = [
