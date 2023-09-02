@@ -8,11 +8,11 @@ from core.category.infra.django_app.repositories import CategoryDjangoRepository
 from core.category.infra.django_app.models import CategoryModel
 from core.category.domain.entities import Category
 
+
 @pytest.mark.django_db
 class TestCategoryDjangoRepositoryInt(unittest.TestCase):
-    
     repo: CategoryDjangoRepository
-    
+
     def setUp(self) -> None:
         self.repo = CategoryDjangoRepository()
 
@@ -20,44 +20,44 @@ class TestCategoryDjangoRepositoryInt(unittest.TestCase):
         category = Category(
             name='Movie',
         )
-        
+
         self.repo.insert(category)
-        
+
         model = CategoryModel.objects.get(pk=category.id)
         self.assertEqual(str(model.id), category.id)
         self.assertEqual(model.name, 'Movie')
         self.assertIsNone(model.description)
         self.assertTrue(model.is_active)
         self.assertEqual(model.created_at, category.created_at)
-        
+
         category = Category(
             name='Movie 2',
             description='Movie Description',
             is_active=False,
         )
-        
+
         self.repo.insert(category)
-    
+
         model = CategoryModel.objects.get(pk=category.id)
         self.assertEqual(str(model.id), category.id)
         self.assertEqual(model.name, 'Movie 2')
         self.assertEqual(model.description, 'Movie Description')
         self.assertFalse(model.is_active)
         self.assertEqual(model.created_at, category.created_at)
-        
+
     def test_throw_not_found_exception_in_find_by_id(self):
         with self.assertRaises(NotFoundException) as assert_error:
             self.repo.find_by_id('fake id')
         self.assertEqual(
-            assert_error.exception.args[0], "Entity not found using ID 'fake id'")
+            assert_error.exception.args[0], "Entity not found using ID 'fake id'"
+        )
 
-        unique_entity_id = UniqueEntityId(
-            '2a181815-db58-43b1-81aa-597e69e66eb8')
+        unique_entity_id = UniqueEntityId('2a181815-db58-43b1-81aa-597e69e66eb8')
         with self.assertRaises(NotFoundException) as assert_error:
             self.repo.find_by_id(unique_entity_id)
         self.assertEqual(
             assert_error.exception.args[0],
-            "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'"
+            "Entity not found using ID '2a181815-db58-43b1-81aa-597e69e66eb8'",
         )
 
     def test_find_by_id(self):
@@ -75,8 +75,29 @@ class TestCategoryDjangoRepositoryInt(unittest.TestCase):
     def test_find_all(self):
         models = baker.make(CategoryModel, _quantity=2)
         categories = self.repo.find_all()
-        
+
         self.assertEqual(len(categories), 2)
         self.assertEqual(categories[0], CategoryModelMapper.to_entity(models[0]))
         self.assertEqual(categories[1], CategoryModelMapper.to_entity(models[1]))
+
+    def test_throw_not_found_exception_in_update(self):
+        entity = Category(name='Movie')
+        with self.assertRaises(NotFoundException) as assert_error:
+            self.repo.update(entity)
+        self.assertEqual(
+            assert_error.exception.args[0], f"Entity not found using ID '{entity.id}'"
+        )
+
+    def test_update(self):
+        category = Category(name='Movie')
+        self.repo.insert(category)
         
+        category.update(name='Movie updated', description='description updated')
+        self.repo.update(category)
+        
+        model = CategoryModel.objects.get(pk=category.id)
+        self.assertEqual(str(model.id), category.id)
+        self.assertEqual(model.name, 'Movie updated')
+        self.assertEqual(model.description, 'description updated')
+        self.assertTrue(model.is_active)
+        self.assertEqual(model.created_at, category.created_at)
