@@ -203,3 +203,129 @@ class TestCategoryDjangoRepositoryInt(unittest.TestCase):
                 filter='E',
             ),
         )
+
+    def test_search_applying_paginate_and_sort(self):
+        default_props = {
+            'description': None,
+            'is_active': True,
+            'created_at': timezone.now(),
+        }
+
+        category_model_name_list = ['b', 'a', 'd', 'e', 'c']
+
+        category_model_list = [
+            CategoryModel(id=UniqueEntityId().id, name=name, **default_props)
+            for name in category_model_name_list
+        ]
+
+        models = CategoryModel.objects.bulk_create(category_model_list)
+
+        arrange_by_asc = [
+            {
+                'search_params': CategoryDjangoRepository.SearchParams(
+                    per_page=2, sort='name'
+                ),
+                'search_output': CategoryDjangoRepository.SearchResult(
+                    items=[
+                        CategoryModelMapper.to_entity(models[1]),
+                        CategoryModelMapper.to_entity(models[0]),
+                    ],
+                    total=5,
+                    current_page=1,
+                    per_page=2,
+                    sort='name',
+                    sort_dir='asc',
+                    filter=None,
+                ),
+            },
+            {
+                'search_params': CategoryDjangoRepository.SearchParams(
+                    page=2, per_page=2, sort='name'
+                ),
+                'search_output': CategoryDjangoRepository.SearchResult(
+                    items=[
+                        CategoryModelMapper.to_entity(models[4]),
+                        CategoryModelMapper.to_entity(models[2]),
+                    ],
+                    total=5,
+                    current_page=2,
+                    per_page=2,
+                    sort='name',
+                    sort_dir='asc',
+                    filter=None,
+                ),
+            },
+        ]
+
+        for index, item in enumerate(arrange_by_asc):
+            search_output = self.repo.search(item['search_params'])
+            self.assertEqual(
+                search_output,
+                item['search_output'],
+                f"The output using sort_dir asc on index {index} is different",
+            )
+
+        arrange_by_desc = [
+            {
+                'search_params': CategoryDjangoRepository.SearchParams(
+                    per_page=2,
+                    sort='name',
+                    sort_dir='desc',
+                ),
+                'search_output': CategoryDjangoRepository.SearchResult(
+                    items=[
+                        CategoryModelMapper.to_entity(models[3]),
+                        CategoryModelMapper.to_entity(models[2]),
+                    ],
+                    total=5,
+                    current_page=1,
+                    per_page=2,
+                    sort='name',
+                    sort_dir='desc',
+                    filter=None,
+                ),
+            },
+            {
+                'search_params': CategoryDjangoRepository.SearchParams(
+                    per_page=2,
+                    sort='name',
+                    sort_dir='desc',
+                ),
+                'search_output': CategoryDjangoRepository.SearchResult(
+                    items=[
+                        CategoryModelMapper.to_entity(models[3]),
+                        CategoryModelMapper.to_entity(models[2]),
+                    ],
+                    total=5,
+                    current_page=1,
+                    per_page=2,
+                    sort='name',
+                    sort_dir='desc',
+                    filter=None,
+                ),
+            },
+            {
+                'search_params': CategoryDjangoRepository.SearchParams(
+                    page=2,
+                    per_page=2,
+                    sort='name',
+                    sort_dir='desc',
+                ),
+                'search_output': CategoryDjangoRepository.SearchResult(
+                    items=[
+                        CategoryModelMapper.to_entity(models[4]),
+                        CategoryModelMapper.to_entity(models[0]),
+                    ],
+                    total=5,
+                    current_page=2,
+                    per_page=2,
+                    sort='name',
+                    sort_dir='desc',
+                    filter=None,
+                ),
+            },
+        ]
+
+        for index, item in enumerate(arrange_by_desc):
+            search_output = self.repo.search(item['search_params'])
+            self.assertEqual(search_output, item['search_output'], f"The output using sort_dir desc on index {index} is different")

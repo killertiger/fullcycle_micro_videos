@@ -59,7 +59,7 @@ class CategoryDjangoRepository(CategoryRepository):
         if input_params.sort and input_params.sort in self.sortable_fields:
             query = query.order_by(
                 input_params.sort
-                if input_params.sort__dir == 'asc'
+                if input_params.sort_dir == 'asc'
                 else f'-{input_params.sort}'
             )
         else:
