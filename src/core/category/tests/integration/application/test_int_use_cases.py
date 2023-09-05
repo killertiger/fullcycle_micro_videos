@@ -1,11 +1,15 @@
 import unittest
-from core.category.infra.django_app.models import CategoryModel
+from core.category.application.dto import CategoryOutput, CategoryOutputMapper
+from core.category.infra.django_app.mapper import CategoryModelMapper
 import pytest
 from model_bakery import baker
+from django.utils import timezone
 from core.__seedwork.domain.exceptions import NotFoundException
+from core.category.infra.django_app.models import CategoryModel
 from core.category.application.use_cases import (
     CreateCategoryUseCase,
     GetCategoryUseCase,
+    ListCategoriesUseCase,
 )
 from core.category.infra.django_app.repositories import CategoryDjangoRepository
 
@@ -86,15 +90,13 @@ class TestCreateCategoryUseInt(unittest.TestCase):
 
 @pytest.mark.django_db
 class TestGetCategoryUseCase(unittest.TestCase):
-    
     use_case: GetCategoryUseCase
     repo: CategoryDjangoRepository
 
     def setUp(self) -> None:
         self.repo = CategoryDjangoRepository()
         self.use_case = GetCategoryUseCase(self.repo)
-        
-    
+
     def test_throws_exception_when_category_not_found(self):
         input_param = GetCategoryUseCase.Input('fake id')
         with self.assertRaises(NotFoundException) as assert_error:
@@ -102,16 +104,56 @@ class TestGetCategoryUseCase(unittest.TestCase):
         self.assertEqual(
             assert_error.exception.args[0], "Entity not found using ID 'fake id'"
         )
-    
+
     def test_execute(self):
         model = baker.make(CategoryModel)
         input_param = GetCategoryUseCase.Input(model.id)
         output = self.use_case.execute(input_param)
-        
-        self.assertEqual(output, GetCategoryUseCase.Output(
-            id=str(model.id),
-            name=model.name,
-            description=model.description,
-            is_active=model.is_active,
-            created_at=model.created_at
-        ))
+
+        self.assertEqual(
+            output,
+            GetCategoryUseCase.Output(
+                id=str(model.id),
+                name=model.name,
+                description=model.description,
+                is_active=model.is_active,
+                created_at=model.created_at,
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestListCategoriesUseCase(unittest.TestCase):
+    use_case: ListCategoriesUseCase
+    repo: CategoryDjangoRepository
+
+    def setUp(self) -> None:
+        self.repo = CategoryDjangoRepository()
+        self.use_case = ListCategoriesUseCase(self.repo)
+
+    def from_model_to_output(self, model: CategoryModel) -> CategoryOutput:
+        entity = CategoryModelMapper.to_entity(model)
+        return CategoryOutputMapper.without_child().to_output(entity)
+
+    def test_execute(self):
+        models = [
+            baker.make(CategoryModel, created_at=timezone.now()),
+            baker.make(CategoryModel, created_at=timezone.now()),
+        ]
+
+        input_param = ListCategoriesUseCase.Input()
+        output = self.use_case.execute(input_param)
+
+        self.assertEqual(
+            output,
+            ListCategoriesUseCase.Output(
+                items=[
+                    self.from_model_to_output(models[1]),
+                    self.from_model_to_output(models[0]),
+                ],
+                total=2,
+                current_page=1,
+                per_page=15,
+                last_page=1,
+            ),
+        )
