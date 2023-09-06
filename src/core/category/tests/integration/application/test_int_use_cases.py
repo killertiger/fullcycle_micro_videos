@@ -1,15 +1,16 @@
 import unittest
-from core.category.application.dto import CategoryOutput, CategoryOutputMapper
-from core.category.infra.django_app.mapper import CategoryModelMapper
 import pytest
 from model_bakery import baker
 from django.utils import timezone
 from core.__seedwork.domain.exceptions import NotFoundException
+from core.category.application.dto import CategoryOutput, CategoryOutputMapper
+from core.category.infra.django_app.mapper import CategoryModelMapper
 from core.category.infra.django_app.models import CategoryModel
 from core.category.application.use_cases import (
     CreateCategoryUseCase,
     GetCategoryUseCase,
     ListCategoriesUseCase,
+    UpdateCategoryUseCase,
 )
 from core.category.infra.django_app.repositories import CategoryDjangoRepository
 
@@ -157,7 +158,7 @@ class TestListCategoriesUseCase(unittest.TestCase):
                 last_page=1,
             ),
         )
-        
+
     def test_execute_using_pagination_and_sort_and_filter(self):
         models = [
             baker.make(CategoryModel, name='a'),
@@ -166,66 +167,149 @@ class TestListCategoriesUseCase(unittest.TestCase):
             baker.make(CategoryModel, name='b'),
             baker.make(CategoryModel, name='C'),
         ]
-        
+
         input_param = ListCategoriesUseCase.Input(
-            page=1,
-            per_page=2,
-            sort='name',
-            sort_dir='asc',
-            filter='a'
+            page=1, per_page=2, sort='name', sort_dir='asc', filter='a'
         )
-        
+
         output = self.use_case.execute(input_param)
-        
-        self.assertEqual(output, ListCategoriesUseCase.Output(
-            items=[
-                self.from_model_to_output(models[1]),
-                self.from_model_to_output(models[2]),
-            ],
-            total=3,
-            current_page=1,
-            per_page=2,
-            last_page=2
-        ))
-        
+
+        self.assertEqual(
+            output,
+            ListCategoriesUseCase.Output(
+                items=[
+                    self.from_model_to_output(models[1]),
+                    self.from_model_to_output(models[2]),
+                ],
+                total=3,
+                current_page=1,
+                per_page=2,
+                last_page=2,
+            ),
+        )
+
         input_param = ListCategoriesUseCase.Input(
-            page=2,
-            per_page=2,
-            sort='name',
-            sort_dir='asc',
-            filter='a'
+            page=2, per_page=2, sort='name', sort_dir='asc', filter='a'
         )
-        
+
         output = self.use_case.execute(input_param)
-        
-        self.assertEqual(output, ListCategoriesUseCase.Output(
-            items=[
-                self.from_model_to_output(models[0]),
-            ],
-            total=3,
-            current_page=2,
-            per_page=2,
-            last_page=2
-        ))
-        
+
+        self.assertEqual(
+            output,
+            ListCategoriesUseCase.Output(
+                items=[
+                    self.from_model_to_output(models[0]),
+                ],
+                total=3,
+                current_page=2,
+                per_page=2,
+                last_page=2,
+            ),
+        )
+
         input_param = ListCategoriesUseCase.Input(
-            page=1,
-            per_page=2,
-            sort='name',
-            sort_dir='desc',
-            filter='a'
+            page=1, per_page=2, sort='name', sort_dir='desc', filter='a'
         )
-        
+
         output = self.use_case.execute(input_param)
-        
-        self.assertEqual(output, ListCategoriesUseCase.Output(
-            items=[
-                self.from_model_to_output(models[0]),
-                self.from_model_to_output(models[2]),
-            ],
-            total=3,
-            current_page=1,
-            per_page=2,
-            last_page=2
-        ))
-        
+
+        self.assertEqual(
+            output,
+            ListCategoriesUseCase.Output(
+                items=[
+                    self.from_model_to_output(models[0]),
+                    self.from_model_to_output(models[2]),
+                ],
+                total=3,
+                current_page=1,
+                per_page=2,
+                last_page=2,
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestUpdateCategoryUseCase(unittest.TestCase):
+    use_case: UpdateCategoryUseCase
+    repo: CategoryDjangoRepository
+
+    def setUp(self) -> None:
+        self.repo = CategoryDjangoRepository()
+        self.use_case = UpdateCategoryUseCase(self.repo)
+
+    def test_throw_exception_when_category_not_found(self):
+        request = UpdateCategoryUseCase.Input(id='not_found', name='test')
+        with self.assertRaises(NotFoundException) as assert_error:
+            self.use_case.execute(request)
+        self.assertEqual(
+            assert_error.exception.args[0], "Entity not found using ID 'not_found'"
+        )
+
+    def test_execute(self):
+        model = baker.make(CategoryModel)
+        request = UpdateCategoryUseCase.Input(id=model.id, name='test 1')
+        response = self.use_case.execute(request)
+        self.assertEqual(
+            response,
+            UpdateCategoryUseCase.Output(
+                id=str(model.id),
+                name='test 1',
+                description=None,
+                is_active=True,
+                created_at=model.created_at,
+            ),
+        )
+
+        arrange = [
+            {
+                'input': {
+                    'id': str(model.id),
+                    'name': 'test 2',
+                    'description': 'description 2',
+                },
+                'expected': {
+                    'id': str(model.id),
+                    'name': 'test 2',
+                    'description': 'description 2',
+                    'is_active': True,
+                    'created_at': model.created_at,
+                },
+            },
+            {
+                'input': {
+                    'id': str(model.id),
+                    'name': 'test 3',
+                    'description': 'description 3',
+                    'is_active': False,
+                },
+                'expected': {
+                    'id': str(model.id),
+                    'name': 'test 3',
+                    'description': 'description 3',
+                    'is_active': False,
+                    'created_at': model.created_at,
+                },
+            },
+            {
+                'input': {'id': str(model.id), 'name': 'test 4', 'is_active': True},
+                'expected': {
+                    'id': str(model.id),
+                    'name': 'test 4',
+                    'description': None,
+                    'is_active': True,
+                    'created_at': model.created_at,
+                },
+            },
+        ]
+
+        for item in arrange:
+            input_param = item['input']
+            expected = item['expected']
+            request = UpdateCategoryUseCase.Input(**input_param)
+            category_output = self.use_case.execute(request)
+            self.assertEqual(category_output, UpdateCategoryUseCase.Output(**expected))
+            category = self.repo.find_by_id(expected['id'])
+            self.assertEqual(category.name, expected['name'])
+            self.assertEqual(category.description, expected['description'])
+            self.assertEqual(category.is_active, expected['is_active'])
+            self.assertEqual(category.created_at, expected['created_at'])
