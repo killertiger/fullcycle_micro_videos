@@ -91,7 +91,7 @@ class TestCreateCategoryUseInt(unittest.TestCase):
 
 
 @pytest.mark.django_db
-class TestGetCategoryUseCase(unittest.TestCase):
+class TestGetCategoryUseCaseInt(unittest.TestCase):
     use_case: GetCategoryUseCase
     repo: CategoryDjangoRepository
 
@@ -125,7 +125,7 @@ class TestGetCategoryUseCase(unittest.TestCase):
 
 
 @pytest.mark.django_db
-class TestListCategoriesUseCase(unittest.TestCase):
+class TestListCategoriesUseCaseInt(unittest.TestCase):
     use_case: ListCategoriesUseCase
     repo: CategoryDjangoRepository
 
