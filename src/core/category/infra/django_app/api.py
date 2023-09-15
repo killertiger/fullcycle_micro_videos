@@ -1,5 +1,6 @@
 from typing import Callable
 from dataclasses import asdict, dataclass
+from core.category.infra.django_app.serializer import CategorySerializer
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -22,8 +23,10 @@ class CategoryResource(APIView):
     delete_use_case: Callable[[], DeleteCategoryUseCase]
 
     def post(self, request: Request):
-        print(request.data)
-        input_param = CreateCategoryUseCase.Input(**request.data)
+        serializer = CategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        input_param = CreateCategoryUseCase.Input(**serializer.validated_data)
         output = self.create_use_case().execute(input_param)
         return Response(asdict(output), http_status.HTTP_201_CREATED)
 
@@ -41,7 +44,12 @@ class CategoryResource(APIView):
         return Response(asdict(output))
 
     def put(self, request: Request, id: str):
-        input_param = UpdateCategoryUseCase.Input(**{'id': id, **request.data})
+        serializer = CategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        input_param = UpdateCategoryUseCase.Input(
+            **{'id': id, **serializer.validated_data}
+        )
         output = self.update_use_case().execute(input_param)
 
         return Response(asdict(output))
