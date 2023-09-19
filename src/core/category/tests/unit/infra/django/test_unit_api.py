@@ -13,6 +13,7 @@ from core.category.application.use_cases import (
     DeleteCategoryUseCase,
 )
 from core.category.infra.django_app.api import CategoryResource
+from core.category.tests.helpers import init_category_resource_all_none
 
 
 class StubCategorySerializer:
@@ -23,15 +24,7 @@ class StubCategorySerializer:
 
 
 class TestCategoryResourceUnit(unittest.TestCase):
-    def __init_all_none(self):
-        return {
-            "list_use_case": None,
-            "create_use_case": None,
-            "get_use_case": None,
-            "update_use_case": None,
-            "delete_use_case": None,
-        }
-
+    
     def test_post_method(self):
         stub_serializer = StubCategorySerializer()
         send_data = {"name": "fake name"}
@@ -54,7 +47,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
 
             resource = CategoryResource(
                 **{
-                    **self.__init_all_none(),
+                    **init_category_resource_all_none(),
                     "create_use_case": lambda: mock_create_use_case,
                 }
             )
@@ -101,7 +94,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
         )
 
         resource = CategoryResource(
-            **{**self.__init_all_none(), "list_use_case": lambda: mock_list_use_case}
+            **{**init_category_resource_all_none(), "list_use_case": lambda: mock_list_use_case}
         )
 
         _request = APIRequestFactory().get(
@@ -152,7 +145,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
 
         resource = CategoryResource(
             **{
-                **self.__init_all_none(),
+                **init_category_resource_all_none(),
                 "get_use_case": lambda: mock_get_use_case,
                 "list_use_case": lambda: mock_list_use_case,
             }
@@ -177,7 +170,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
         )
 
     def test_if_get_invoke_get_object_2(self):
-        resource = CategoryResource(**self.__init_all_none())
+        resource = CategoryResource(**init_category_resource_all_none())
         resource.get_object = mock.Mock()
         resource.get(None, "fc98cf57-4615-4b0a-b5eb-373870ca27ce")
         resource.get_object.assert_called_once()
@@ -194,7 +187,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
         )
 
         resource = CategoryResource(
-            **{**self.__init_all_none(), "get_use_case": lambda: mock_get_use_case}
+            **{**init_category_resource_all_none(), "get_use_case": lambda: mock_get_use_case}
         )
 
         response = resource.get_object("fc98cf57-4615-4b0a-b5eb-373870ca27ce")
@@ -229,7 +222,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
 
         resource = CategoryResource(
             **{
-                **self.__init_all_none(),
+                **init_category_resource_all_none(),
                 "update_use_case": lambda: mock_update_use_case,
             }
         )
@@ -264,7 +257,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
 
         resource = CategoryResource(
             **{
-                **self.__init_all_none(),
+                **init_category_resource_all_none(),
                 "delete_use_case": lambda: mock_delete_use_case,
             }
         )
