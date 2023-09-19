@@ -3,8 +3,6 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 from core.category.domain.repositories import CategoryRepository
 from core.category.infra.django_app.api import CategoryResource
-from core.category.infra.django_app.models import CategoryModel
-from core.category.infra.django_app.repositories import CategoryDjangoRepository
 from core.category.tests.fixture.categories_api_fixture import (
     CategoryAPIFixture,
     HttpExpect,
@@ -18,8 +16,7 @@ class TestCategoryResourcePostMethodInt:
 
     @classmethod
     def setup_class(cls):
-        # cls.repo = CategoryDjangoRepository()
-        cls.repo = container.repository_category_in_memory()
+        cls.repo = container.repository_category_django_orm()
         cls.resource = CategoryResource(
             create_use_case=container.use_case_category_create_category,
             update_use_case=None,

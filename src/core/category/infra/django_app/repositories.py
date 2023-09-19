@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, TYPE_CHECKING, Type
 from django.core import exceptions as django_exceptions
 from django.core.paginator import Paginator
 from core.__seedwork.domain.exceptions import NotFoundException
@@ -6,11 +6,18 @@ from core.__seedwork.domain.value_objects import UniqueEntityId
 from core.category.domain.entities import Category
 from core.category.domain.repositories import CategoryRepository
 from core.category.infra.django_app.mapper import CategoryModelMapper
-from core.category.infra.django_app.models import CategoryModel
+
+if TYPE_CHECKING:
+    from core.category.infra.django_app.models import CategoryModel
 
 
 class CategoryDjangoRepository(CategoryRepository):
     sortable_fields: List[str] = ['name', 'created_at']
+    model: Type['CategoryModel']
+    
+    def __init__(self) -> None:
+        from core.category.infra.django_app.models import CategoryModel
+        self.model = CategoryModel
 
     def insert(self, entity: Category) -> None:
         model = CategoryModelMapper.to_model(entity)
@@ -24,7 +31,7 @@ class CategoryDjangoRepository(CategoryRepository):
     def find_all(self) -> List[Category]:
         return [
             CategoryModelMapper.to_entity(model)
-            for model in CategoryModel.objects.all()
+            for model in self.model.objects.all()
         ]
 
     def update(self, entity: Category) -> None:
@@ -37,11 +44,11 @@ class CategoryDjangoRepository(CategoryRepository):
         model = self._get(id_str)
         model.delete()
 
-    def _get(self, entity_id: str) -> CategoryModel:
+    def _get(self, entity_id: str) -> 'CategoryModel':
         try:
-            return CategoryModel.objects.get(pk=entity_id)
+            return self.model.objects.get(pk=entity_id)
         except (
-            CategoryModel.DoesNotExist,
+            self.model.DoesNotExist,
             django_exceptions.ValidationError,
         ) as exception:
             raise NotFoundException(
@@ -51,7 +58,7 @@ class CategoryDjangoRepository(CategoryRepository):
     def search(
         self, input_params: CategoryRepository.SearchParams
     ) -> CategoryRepository.SearchResult:
-        query = CategoryModel.objects.all()
+        query = self.model.objects.all()
 
         if input_params.filter:
             query = query.filter(name__icontains=input_params.filter)
