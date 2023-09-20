@@ -39,13 +39,8 @@ class TestCategoryResourcePostMethodInt:
         )
 
         category_created = self.repo.find_by_id(response.data['id'])
-        assert response.data == {
-            'id': category_created.id,
-            'name': category_created.name,
-            'description': category_created.description,
-            'is_active': category_created.is_active,
-            'created_at': category_created.created_at,
-        }
+        serialized = CategoryResource.category_to_response(category_created)
+        assert response.data == serialized
 
         expected_data = {**http_expect.request.body, **http_expect.response.body}
         for key, value in expected_data.items():

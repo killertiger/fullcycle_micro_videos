@@ -25,20 +25,27 @@ class StubCategorySerializer:
 
 
 class TestCategoryResourceUnit(unittest.TestCase):
-    
-    @mock.patch.object(
-        CategorySerializer,
-        '__new__'
-    )
+    @mock.patch.object(CategorySerializer, '__new__')
     def test_category_to_response_method(self, mock_serializer):
-        mock_serializer.return_value = namedtuple('Faker', ['data'])(data='test') # creates a typed class on the fly
+        mock_serializer.return_value = namedtuple('Faker', ['data'])(
+            data='test'
+        )  # creates a typed class on the fly
         data = CategoryResource.category_to_response('output')
         mock_serializer.assert_called_with(CategorySerializer, instance='output')
         self.assertEqual(data, 'test')
-    
-    def test_post_method(self):
+
+    @mock.patch.object(CategoryResource, 'category_to_response')
+    def test_post_method(self, mock_category_to_response):
         stub_serializer = StubCategorySerializer()
         send_data = {"name": "fake name"}
+
+        expected_response = {
+            'id': 'fc98cf57-4615-4b0a-b5eb-373870ca27ce',
+            'name': 'Movie',
+            'description': None,
+            'is_active': True,
+            'created_at': datetime.now(),
+        }
 
         with mock.patch.object(
             CategorySerializer, '__new__', return_value=stub_serializer
@@ -49,12 +56,10 @@ class TestCategoryResourceUnit(unittest.TestCase):
             mock_create_use_case = mock.Mock(CreateCategoryUseCase)
 
             mock_create_use_case.execute.return_value = CreateCategoryUseCase.Output(
-                id="fc98cf57-4615-4b0a-b5eb-373870ca27ce",
-                name="Movie",
-                description=None,
-                is_active=True,
-                created_at=datetime.now(),
+                **expected_response
             )
+
+            mock_category_to_response.return_value = expected_response
 
             resource = CategoryResource(
                 **{
@@ -73,6 +78,10 @@ class TestCategoryResourceUnit(unittest.TestCase):
             mock_create_use_case.execute.assert_called_with(
                 CreateCategoryUseCase.Input(name="fake name")
             )
+            mock_category_to_response.assert_called_with(
+                mock_create_use_case.execute.return_value
+            )
+
             self.assertEqual(response.status_code, 201)
             self.assertEqual(
                 response.data,
@@ -81,7 +90,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
                     "name": "Movie",
                     "description": None,
                     "is_active": True,
-                    "created_at": mock_create_use_case.execute.return_value.created_at,
+                    "created_at": expected_response['created_at'],
                 },
             )
         mock_serializer.assert_called_with(CategorySerializer, data=send_data)
@@ -105,7 +114,10 @@ class TestCategoryResourceUnit(unittest.TestCase):
         )
 
         resource = CategoryResource(
-            **{**init_category_resource_all_none(), "list_use_case": lambda: mock_list_use_case}
+            **{
+                **init_category_resource_all_none(),
+                "list_use_case": lambda: mock_list_use_case,
+            }
         )
 
         _request = APIRequestFactory().get(
@@ -198,7 +210,10 @@ class TestCategoryResourceUnit(unittest.TestCase):
         )
 
         resource = CategoryResource(
-            **{**init_category_resource_all_none(), "get_use_case": lambda: mock_get_use_case}
+            **{
+                **init_category_resource_all_none(),
+                "get_use_case": lambda: mock_get_use_case,
+            }
         )
 
         response = resource.get_object("fc98cf57-4615-4b0a-b5eb-373870ca27ce")
