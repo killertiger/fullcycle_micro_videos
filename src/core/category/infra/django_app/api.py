@@ -69,6 +69,6 @@ class CategoryResource(APIView):
         return Response(status=http_status.HTTP_204_NO_CONTENT)
     
     @staticmethod
-    def category_to_response(category: CategoryOutput):
-        serializer = CategorySerializer(instance= category)
+    def category_to_response(output: CategoryOutput):
+        serializer = CategorySerializer(instance=output)
         return serializer.data

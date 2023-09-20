@@ -1,3 +1,4 @@
+from collections import namedtuple
 from datetime import datetime
 import unittest
 from unittest import mock
@@ -24,6 +25,16 @@ class StubCategorySerializer:
 
 
 class TestCategoryResourceUnit(unittest.TestCase):
+    
+    @mock.patch.object(
+        CategorySerializer,
+        '__new__'
+    )
+    def test_category_to_response_method(self, mock_serializer):
+        mock_serializer.return_value = namedtuple('Faker', ['data'])(data='test') # creates a typed class on the fly
+        data = CategoryResource.category_to_response('output')
+        mock_serializer.assert_called_with(CategorySerializer, instance='output')
+        self.assertEqual(data, 'test')
     
     def test_post_method(self):
         stub_serializer = StubCategorySerializer()
