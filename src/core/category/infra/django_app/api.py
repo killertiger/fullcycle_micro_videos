@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import status as http_status
+from core.__seedwork.infra.serializers import UUIDSerializer
 from core.category.application.dto import CategoryOutput
 from core.category.infra.django_app.serializer import CategorySerializer
 from core.category.application.use_cases import (
@@ -42,6 +43,8 @@ class CategoryResource(APIView):
         return Response(asdict(output))
 
     def get_object(self, id: str):
+        CategoryResource.validate_id(id)
+        
         input_param = GetCategoryUseCase.Input(id)
         output = self.get_use_case().execute(input_param)
         body = CategoryResource.category_to_response(output)
@@ -50,6 +53,8 @@ class CategoryResource(APIView):
 
 
     def put(self, request: Request, id: str):
+        CategoryResource.validate_id(id)
+        
         serializer = CategorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -63,6 +68,8 @@ class CategoryResource(APIView):
 
 
     def delete(self, _request: Request, id: str):
+        CategoryResource.validate_id(id)
+        
         input_param = DeleteCategoryUseCase.Input(id=id)
         self.delete_use_case().execute(input_param)
 
@@ -72,3 +79,8 @@ class CategoryResource(APIView):
     def category_to_response(output: CategoryOutput):
         serializer = CategorySerializer(instance=output)
         return serializer.data
+
+    @staticmethod
+    def validate_id(id: str):
+        serializer = UUIDSerializer(data={'id': id})
+        serializer.is_valid(raise_exception=True)
