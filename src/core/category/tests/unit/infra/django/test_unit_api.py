@@ -170,17 +170,27 @@ class TestCategoryResourceUnit(unittest.TestCase):
             },
         )
 
-    def test_if_get_invoke_get_object(self):
+    @mock.patch.object(CategoryResource, 'category_to_response')
+    @mock.patch.object(CategoryResource, 'validate_id')
+    def test_if_get_invoke_get_object(self, mock_validate_id, mock_category_to_response):
         mock_get_use_case = mock.Mock(GetCategoryUseCase)
         mock_list_use_case = mock.Mock(ListCategoriesUseCase)
+        uuid_value = 'fc98cf57-4615-4b0a-b5eb-373870ca27ce'
+        
+        expected_response = {
+            'id': uuid_value,
+            'name': 'Movie',
+            'description': None,
+            'is_active': True,
+            'created_at': datetime.now()
+        }
 
         mock_get_use_case.execute.return_value = GetCategoryUseCase.Output(
-            id="fc98cf57-4615-4b0a-b5eb-373870ca27ce",
-            name="Movie",
-            description=None,
-            is_active=True,
-            created_at=datetime.now(),
+            **expected_response
         )
+        mock_category_to_response.return_value = {
+            **expected_response,
+        }
 
         resource = CategoryResource(
             **{
@@ -190,22 +200,18 @@ class TestCategoryResourceUnit(unittest.TestCase):
             }
         )
 
-        response = resource.get(None, "fc98cf57-4615-4b0a-b5eb-373870ca27ce")
+        response = resource.get(None, uuid_value)
 
         self.assertEqual(mock_list_use_case.call_count, 0)
+        mock_validate_id.assert_called_with(uuid_value)
         mock_get_use_case.execute.assert_called_with(
-            GetCategoryUseCase.Input(id="fc98cf57-4615-4b0a-b5eb-373870ca27ce")
+            GetCategoryUseCase.Input(id=uuid_value)
         )
+        mock_category_to_response.assert_called_with(mock_get_use_case.execute.return_value)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data,
-            {
-                "id": "fc98cf57-4615-4b0a-b5eb-373870ca27ce",
-                "name": "Movie",
-                "description": None,
-                "is_active": True,
-                "created_at": mock_get_use_case.execute.return_value.created_at,
-            },
+            expected_response,
         )
 
     def test_if_get_invoke_get_object_2(self):
