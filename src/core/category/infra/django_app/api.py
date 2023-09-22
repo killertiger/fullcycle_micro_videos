@@ -6,7 +6,10 @@ from rest_framework.views import APIView
 from rest_framework import status as http_status
 from core.__seedwork.infra.serializers import UUIDSerializer
 from core.category.application.dto import CategoryOutput
-from core.category.infra.django_app.serializer import CategorySerializer
+from core.category.infra.django_app.serializer import (
+    CategorySerializer,
+    CategoryCollectionSerializer,
+)
 from core.category.application.use_cases import (
     CreateCategoryUseCase,
     ListCategoriesUseCase,
@@ -31,7 +34,7 @@ class CategoryResource(APIView):
         input_param = CreateCategoryUseCase.Input(**serializer.validated_data)
         output = self.create_use_case().execute(input_param)
         body = CategoryResource.category_to_response(output)
-        
+
         return Response(body, http_status.HTTP_201_CREATED)
 
     def get(self, request: Request, id: str = None):
@@ -40,21 +43,28 @@ class CategoryResource(APIView):
 
         input_param = ListCategoriesUseCase.Input(**request.query_params.dict())
         output = self.list_use_case().execute(input_param)
-        return Response(asdict(output))
+
+        pagination = asdict(output)
+        pagination.pop('items')
+        data = CategoryCollectionSerializer(
+            instance=output.items,
+            pagination=pagination
+        ).data
+        print(data)
+        return Response(data)
 
     def get_object(self, id: str):
         CategoryResource.validate_id(id)
-        
+
         input_param = GetCategoryUseCase.Input(id)
         output = self.get_use_case().execute(input_param)
         body = CategoryResource.category_to_response(output)
-        
-        return Response(body, http_status.HTTP_200_OK)
 
+        return Response(body, http_status.HTTP_200_OK)
 
     def put(self, request: Request, id: str):
         CategoryResource.validate_id(id)
-        
+
         serializer = CategorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -63,18 +73,17 @@ class CategoryResource(APIView):
         )
         output = self.update_use_case().execute(input_param)
         body = CategoryResource.category_to_response(output)
-        
-        return Response(body, http_status.HTTP_201_CREATED)
 
+        return Response(body, http_status.HTTP_201_CREATED)
 
     def delete(self, _request: Request, id: str):
         CategoryResource.validate_id(id)
-        
+
         input_param = DeleteCategoryUseCase.Input(id=id)
         self.delete_use_case().execute(input_param)
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
-    
+
     @staticmethod
     def category_to_response(output: CategoryOutput):
         serializer = CategorySerializer(instance=output)
