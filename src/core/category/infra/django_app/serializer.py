@@ -1,6 +1,6 @@
-from core.__seedwork.application.dto import PaginationOutput
 from rest_framework import serializers, ISO_8601
 from rest_framework.fields import empty
+from core.__seedwork.infra.django_app.serializers import CollectionSerializer
 
 
 class CategorySerializer(serializers.Serializer):
@@ -11,28 +11,5 @@ class CategorySerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True, format=ISO_8601)
 
 
-class PaginationSerializer(serializers.Serializer):
-    total = serializers.IntegerField()
-    current_page = serializers.IntegerField()
-    per_page = serializers.IntegerField()
-    last_page = serializers.IntegerField()
-
-class CategoryCollectionSerializer(serializers.ListSerializer):
-    pagination: PaginationOutput
+class CategoryCollectionSerializer(CollectionSerializer):
     child = CategorySerializer()
-    many = False
-    
-    def __init__(self, pagination, **kwargs):
-        self.pagination = pagination
-        super().__init__(**kwargs)
-    
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        return {
-            'data': data,
-            'meta': PaginationSerializer(self.pagination).data
-        }
-        
-    @property
-    def data(self):
-        return self.to_representation(self.instance)

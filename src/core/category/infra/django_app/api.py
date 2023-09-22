@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import status as http_status
-from core.__seedwork.infra.serializers import UUIDSerializer
+from core.__seedwork.infra.django_app.serializers import UUIDSerializer
 from core.category.application.dto import CategoryOutput
 from core.category.infra.django_app.serializer import (
     CategorySerializer,
@@ -43,13 +43,7 @@ class CategoryResource(APIView):
 
         input_param = ListCategoriesUseCase.Input(**request.query_params.dict())
         output = self.list_use_case().execute(input_param)
-
-        pagination = asdict(output)
-        pagination.pop('items')
-        data = CategoryCollectionSerializer(
-            instance=output.items,
-            pagination=pagination
-        ).data
+        data = CategoryCollectionSerializer(instance=output).data
         print(data)
         return Response(data)
 

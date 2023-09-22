@@ -4,7 +4,7 @@ import unittest
 from unittest import mock
 from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
-from core.__seedwork.infra.serializers import UUIDSerializer
+from core.__seedwork.infra.django_app.serializers import UUIDSerializer
 from core.category.application.dto import CategoryOutput
 from core.category.infra.django_app.serializer import CategorySerializer
 from core.category.application.use_cases import (
