@@ -9,8 +9,8 @@ class TestEntitiesFakerBuilder(unittest.TestCase):
         # print(CategoryFakerBuilder.a_category().build())
         # print(CategoryFakerBuilder.the_categories(2).build())
         
-        faker = CategoryFakerBuilder.a_category()
-        print(faker.build())
+        faker = CategoryFakerBuilder.the_categories(2)
+        faker = faker.with_name(lambda index: 'Moaaaaaaaaa' + str(index))
         print(faker.build())
         print(faker.name)
         print(faker.name)
