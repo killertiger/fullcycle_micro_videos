@@ -23,6 +23,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-django>=4.5.2",
     "model-bakery>=1.15.0",
+    "faker>=19.6.2",
 ]
 
 [tool.pdm.scripts]

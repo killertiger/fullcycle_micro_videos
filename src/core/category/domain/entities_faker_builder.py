@@ -1,10 +1,12 @@
-from dataclasses import dataclass, Field
+from dataclasses import dataclass, field
+from faker import Faker
 from core.category.domain.entities import Category
 
 @dataclass
 class CategoryFakerBuilder:
-    name: str = Field(default='Movie', init=False)
-    is_active: bool = Field(default=True, init=False)
+    name: str = field(default_factory=lambda: Faker().name(), init=False)
+    description: str = field(default_factory=lambda: Faker().sentence(), init=False)
+    is_active: bool = field(default=True, init=False)
     
     @staticmethod
     def a_category():
@@ -31,4 +33,4 @@ class CategoryFakerBuilder:
         return self
     
     def build(self):
-        Category(name=self.name, is_active=self.is_active)
+        return Category(name=self.name, description=self.description, is_active=self.is_active)
