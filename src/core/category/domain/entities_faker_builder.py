@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List
+from typing import TypeVar, Generic, List, Callable
 from dataclasses import dataclass, field
 from faker import Faker
 from core.category.domain.entities import Category
@@ -6,13 +6,15 @@ from core.category.domain.entities import Category
 
 T = TypeVar('T')
 
+PropFactory = T | Callable[[], T]
+
 @dataclass
 class CategoryFakerBuilder(Generic[T]):
     count_objs: int = 1
     
-    name: str = field(default_factory=lambda: Faker().name(), init=False)
-    description: str = field(default_factory=lambda: Faker().sentence(), init=False)
-    is_active: bool = field(default=True, init=False)
+    __name: PropFactory[str] = field(default=lambda self: Faker().name(), init=False)
+    __description: PropFactory[str | None] = field(default=lambda self: Faker().sentence(), init=False)
+    __is_active: bool = field(default=lambda self: True, init=False)
     
     @staticmethod
     def a_category() -> 'CategoryFakerBuilder[Category]':
@@ -31,16 +33,20 @@ class CategoryFakerBuilder(Generic[T]):
     def a_deactivate_category():
         return CategoryFakerBuilder()
     
-    def with_name(self, name: str):
-        self.name = name
+    def with_name(self, value: PropFactory[str]):
+        self.__name = value
+        return self
+    
+    def with_description(self, value: PropFactory[str | None]):
+        self.__description = value
         return self
 
     def activate(self):
-        self.is_active = True
+        self.__is_active = True
         return self
     
     def deactivate(self):
-        self.is_active = False
+        self.__is_active = False
         return self
     
     def build(self) -> T:
@@ -50,3 +56,18 @@ class CategoryFakerBuilder(Generic[T]):
         ))
         
         return categories if self.count_objs > 1 else categories[0]
+    
+    @property
+    def name(self):
+        return self.__call_factory(self.__name)
+    
+    @property
+    def description(self):
+        return self.__call_factory(self.__description)
+    
+    @property
+    def is_active(self):
+        return self.__call_factory(self.__is_active)
+    
+    def __call_factory(self, value: PropFactory[T]) -> T:
+        return value() if callable(value) else value
