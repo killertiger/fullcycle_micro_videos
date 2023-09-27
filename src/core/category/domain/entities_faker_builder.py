@@ -42,7 +42,7 @@ class CategoryFakerBuilder(Generic[T]):
     # @staticmethod
     # def a_deactivate_category():
     #     return CategoryFakerBuilder()
-    
+
     def with_unique_entity_id(self, value: PropOrFactory[UniqueEntityId]):
         self.__unique_entity_id = value
         return self
@@ -57,6 +57,40 @@ class CategoryFakerBuilder(Generic[T]):
 
     def with_created_at(self, value: PropOrFactory[datetime | None]):
         self.__created_at = value
+        return self
+
+    def with_invalid_name_none(self):
+        self.__name = None
+        return self
+
+    def with_invalid_name_empty(self):
+        self.__name = ''
+        return self
+
+    def with_invalid_name_not_string(self, value: Any = None):
+        self.__name = value if value is not None else 123
+        return self
+
+    def with_invalid_name_too_long(self, value: str = None):
+        self.__name = (
+            value if value is not None else ''.join(Faker().random_letters(length=256))
+        )
+        return self
+    
+    def with_invalid_description_not_string(self, value: Any = None):
+        self.__description = value if value is not None else 123
+        return self
+    
+    def with_invalid_is_active_none(self):
+        self.__is_active = None
+        return self
+    
+    def with_invalid_is_active_empty(self):
+        self.__is_active = ''
+        return self
+        
+    def with_invalid_is_active_not_boolean(self, value: Any = None):
+        self.__is_active = value if value is not None else 123
         return self
 
     def activate(self):
