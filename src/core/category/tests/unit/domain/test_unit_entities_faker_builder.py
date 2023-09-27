@@ -1,6 +1,7 @@
 from datetime import datetime
 import unittest
 from core.__seedwork.domain.value_objects import UniqueEntityId
+from core.category.domain.entities import Category
 from core.category.domain.entities_faker_builder import CategoryFakerBuilder
 
 
@@ -104,18 +105,68 @@ class TestEntitiesFakerBuilder(unittest.TestCase):
         self.assertEqual(faker.created_at, created_at)
         self.assertIsInstance(this, CategoryFakerBuilder)
     
-    def test_build(self):
-        # tmp = CategoryFakerBuilder.a_category()
-        # print(CategoryFakerBuilder.a_category().build())
-        # print(CategoryFakerBuilder.the_categories(2).build())
+    def test_build_a_category(self):
+        faker = CategoryFakerBuilder.a_category()
+        category = faker.build()
         
+        self.assert_category_props_types(category)
+        
+        unique_entity_id = UniqueEntityId()
+        created_at = datetime.now()
+        
+        builder = faker.with_unique_entity_id(unique_entity_id)\
+            .with_name('name test')\
+            .with_description('description test')\
+            .deactivate()\
+            .with_created_at(created_at)
+        
+        category = builder.build()
+        self.assert_category(category, unique_entity_id, created_at)
+        
+        builder= builder.activate()
+        category = builder.build()
+        self.assertTrue(category.is_active)
+        
+    def test_build_the_categories(self):
         faker = CategoryFakerBuilder.the_categories(2)
-        uuid = UniqueEntityId()
-        date = datetime.now()
-        faker = faker.with_name(lambda index: 'Moaaaaaaaaa' + str(index))
-        faker = faker.with_unique_entity_id(uuid).with_created_at(date)
-        print(faker.build())
-        # print(faker.name)
-        # print(faker.name)
-        # print(faker.name)
-        # print(faker.name)
+        categories = faker.build()
+        
+        self.assertIsNotNone(categories)
+        self.assertIsInstance(categories, list)
+        self.assertEqual(len(categories), 2)
+        
+        for category in categories:
+            self.assert_category_props_types(category)
+        
+        unique_entity_id = UniqueEntityId()
+        created_at = datetime.now()
+        
+        builder = faker.with_unique_entity_id(unique_entity_id)\
+            .with_name('name test')\
+            .with_description('description test')\
+            .deactivate()\
+            .with_created_at(created_at)
+        
+        categories = builder.build()
+        for category in categories:
+            self.assert_category(category, unique_entity_id, created_at)
+        
+        builder= builder.activate()
+        categories = builder.build()
+        for category in categories:
+            self.assertTrue(category.is_active)
+            
+    def assert_category_props_types(self, category: Category):
+        self.assertIsInstance(category.unique_entity_id, UniqueEntityId)
+        self.assertIsInstance(category.name, str)
+        self.assertIsInstance(category.description, str)
+        self.assertIsInstance(category.is_active, bool)
+        self.assertIsInstance(category.created_at, datetime)
+        self.assertTrue(category.is_active)
+        
+    def assert_category(self, category: Category, unique_entity_id: UniqueEntityId, created_at: datetime):
+        self.assertEqual(category.unique_entity_id, unique_entity_id)
+        self.assertEqual(category.name, 'name test')
+        self.assertEqual(category.description, 'description test')
+        self.assertFalse(category.is_active)
+        self.assertEqual(category.created_at, created_at)
