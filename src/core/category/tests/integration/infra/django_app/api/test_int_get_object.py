@@ -39,7 +39,7 @@ class TestCategoryResourceGetObjectMethodInt:
         
         
     def test_get_object_method(self):
-        category = Category(name='movie')
+        category = Category.fake().a_category().build()
         self.repo.insert(category)
         
         response = self.resource.get_object(category.id)

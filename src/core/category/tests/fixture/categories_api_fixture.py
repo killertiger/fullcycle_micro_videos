@@ -1,6 +1,7 @@
 from typing import Any
 from dataclasses import dataclass
 import pytest
+from core.category.domain.entities import Category
 
 
 @dataclass
@@ -26,18 +27,23 @@ class CategoryAPIFixture:
 
     @staticmethod
     def arrange_for_save():
+        faker = Category.fake().a_category()\
+            .with_name('Movie')\
+            .with_description('description test')
+
         data = [
             HttpExpect(
                 request=Request(
                     body={
-                        'name': 'Movie',
+                        'name': faker.name,
                     }
                 ),
-                response=Response(body={'description': None, 'is_active': True}),
+                response=Response(
+                    body={'description': None, 'is_active': True}),
             ),
             HttpExpect(
                 request=Request(
-                    body={'name': 'Movie', 'description': 'some description'}
+                    body={'name': faker.name, 'description': faker.description}
                 ),
                 response=Response(body={'is_active': True}),
             ),
