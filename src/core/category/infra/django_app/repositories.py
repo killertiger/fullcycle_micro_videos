@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class CategoryDjangoRepository(CategoryRepository):
     sortable_fields: List[str] = ['name', 'created_at']
     model: Type['CategoryModel']
-    
+
     def __init__(self) -> None:
         from core.category.infra.django_app.models import CategoryModel
         self.model = CategoryModel
@@ -22,6 +22,10 @@ class CategoryDjangoRepository(CategoryRepository):
     def insert(self, entity: Category) -> None:
         model = CategoryModelMapper.to_model(entity)
         model.save()
+
+    def bulk_insert(self, entities: List[Category]) -> None:
+        category_list = map(CategoryModelMapper.to_model, entities)
+        self.model.objects.bulk_create(category_list)
 
     def find_by_id(self, entity_id: str | UniqueEntityId) -> Category:
         id_str = str(entity_id)

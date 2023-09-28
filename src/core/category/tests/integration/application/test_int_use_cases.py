@@ -1,8 +1,10 @@
+import datetime
 import unittest
 import pytest
 from model_bakery import baker
 from django.utils import timezone
 from core.__seedwork.domain.exceptions import NotFoundException
+from core.category.domain.entities import Category
 from core.category.application.dto import CategoryOutput, CategoryOutputMapper
 from core.category.infra.django_app.mapper import CategoryModelMapper
 from core.category.infra.django_app.models import CategoryModel
@@ -133,15 +135,21 @@ class TestListCategoriesUseCaseInt(unittest.TestCase):
         self.repo = CategoryDjangoRepository()
         self.use_case = ListCategoriesUseCase(self.repo)
 
-    def from_model_to_output(self, model: CategoryModel) -> CategoryOutput:
-        entity = CategoryModelMapper.to_entity(model)
+    # def from_model_to_output(self, model: CategoryModel) -> CategoryOutput:
+    #     entity = CategoryModelMapper.to_entity(model)
+    #     return CategoryOutputMapper.without_child().to_output(entity)
+    
+    def from_entity_to_output(self, entity: Category) -> CategoryOutput:
         return CategoryOutputMapper.without_child().to_output(entity)
 
     def test_execute_using_empty_search_params(self):
-        models = [
-            baker.make(CategoryModel, created_at=timezone.now()),
-            baker.make(CategoryModel, created_at=timezone.now()),
-        ]
+        categories = Category.fake().the_categories(2)\
+            .with_created_at(
+                lambda index: datetime.datetime.now(
+                    datetime.timezone.utc) + datetime.timedelta(days=index)
+        ).build()
+
+        self.repo.bulk_insert(categories)
 
         input_param = ListCategoriesUseCase.Input()
         output = self.use_case.execute(input_param)
@@ -150,8 +158,8 @@ class TestListCategoriesUseCaseInt(unittest.TestCase):
             output,
             ListCategoriesUseCase.Output(
                 items=[
-                    self.from_model_to_output(models[1]),
-                    self.from_model_to_output(models[0]),
+                    self.from_entity_to_output(categories[1]),
+                    self.from_entity_to_output(categories[0]),
                 ],
                 total=2,
                 current_page=1,
@@ -308,7 +316,8 @@ class TestUpdateCategoryUseCaseInt(unittest.TestCase):
             expected = item['expected']
             request = UpdateCategoryUseCase.Input(**input_param)
             category_output = self.use_case.execute(request)
-            self.assertEqual(category_output, UpdateCategoryUseCase.Output(**expected))
+            self.assertEqual(
+                category_output, UpdateCategoryUseCase.Output(**expected))
             category = self.repo.find_by_id(expected['id'])
             self.assertEqual(category.name, expected['name'])
             self.assertEqual(category.description, expected['description'])
@@ -318,14 +327,14 @@ class TestUpdateCategoryUseCaseInt(unittest.TestCase):
 
 @pytest.mark.django_db
 class TestDeleteCategoryUseCaseInt(unittest.TestCase):
-    
+
     repo: CategoryDjangoRepository
     use_case: DeleteCategoryUseCase
-    
+
     def setUp(self) -> None:
         self.repo = CategoryDjangoRepository()
         self.use_case = DeleteCategoryUseCase(self.repo)
-    
+
     def test_throw_exception_when_category_not_found(self):
         request = DeleteCategoryUseCase.Input(id='not_found')
         with self.assertRaises(NotFoundException) as assert_error:
@@ -333,11 +342,11 @@ class TestDeleteCategoryUseCaseInt(unittest.TestCase):
         self.assertEqual(
             assert_error.exception.args[0], "Entity not found using ID 'not_found'"
         )
-        
+
     def test_execute(self):
         model = baker.make(CategoryModel)
         request = DeleteCategoryUseCase.Input(id=str(model.id))
         self.use_case.execute(request)
-        
+
         with self.assertRaises(NotFoundException):
             self.repo.find_by_id(str(model.id))

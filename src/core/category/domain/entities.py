@@ -51,3 +51,8 @@ class Category(Entity):
         is_valid = validator.validate(self.to_dict())
         if not is_valid:
             raise EntityValidationException(validator.errors)
+
+    @staticmethod
+    def fake():
+        from .entities_faker_builder import CategoryFakerBuilder
+        return CategoryFakerBuilder

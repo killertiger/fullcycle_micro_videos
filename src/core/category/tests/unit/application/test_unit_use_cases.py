@@ -206,8 +206,8 @@ class TestListCategoryUseCase(unittest.TestCase):
     def test_execute_using_empty_search_params(self):
         self.category_repo.items = [
             Category(name='Movie 1'),
-            Category(name='Movie 2', created_at=datetime.datetime.now(datetime.timezone.utc) +
-                     datetime.timedelta(seconds=200)),
+            Category(name='Movie 2', created_at=datetime.datetime.now(
+                datetime.timezone.utc) + datetime.timedelta(seconds=200)),
         ]
 
         with patch.object(self.category_repo, 'search',
