@@ -1,13 +1,9 @@
 import datetime
 import unittest
 import pytest
-from model_bakery import baker
-from django.utils import timezone
 from core.__seedwork.domain.exceptions import NotFoundException
 from core.category.domain.entities import Category
 from core.category.application.dto import CategoryOutput, CategoryOutputMapper
-from core.category.infra.django_app.mapper import CategoryModelMapper
-from core.category.infra.django_app.models import CategoryModel
 from core.category.application.use_cases import (
     CreateCategoryUseCase,
     GetCategoryUseCase,
@@ -110,18 +106,20 @@ class TestGetCategoryUseCaseInt(unittest.TestCase):
         )
 
     def test_execute(self):
-        model = baker.make(CategoryModel)
-        input_param = GetCategoryUseCase.Input(model.id)
+        entity = Category.fake().a_category().build()
+        self.repo.insert(entity)
+
+        input_param = GetCategoryUseCase.Input(entity.id)
         output = self.use_case.execute(input_param)
 
         self.assertEqual(
             output,
             GetCategoryUseCase.Output(
-                id=str(model.id),
-                name=model.name,
-                description=model.description,
-                is_active=model.is_active,
-                created_at=model.created_at,
+                id=str(entity.id),
+                name=entity.name,
+                description=entity.description,
+                is_active=entity.is_active,
+                created_at=entity.created_at,
             ),
         )
 
@@ -135,10 +133,6 @@ class TestListCategoriesUseCaseInt(unittest.TestCase):
         self.repo = CategoryDjangoRepository()
         self.use_case = ListCategoriesUseCase(self.repo)
 
-    # def from_model_to_output(self, model: CategoryModel) -> CategoryOutput:
-    #     entity = CategoryModelMapper.to_entity(model)
-    #     return CategoryOutputMapper.without_child().to_output(entity)
-    
     def from_entity_to_output(self, entity: Category) -> CategoryOutput:
         return CategoryOutputMapper.without_child().to_output(entity)
 
@@ -169,13 +163,17 @@ class TestListCategoriesUseCaseInt(unittest.TestCase):
         )
 
     def test_execute_using_pagination_and_sort_and_filter(self):
-        models = [
-            baker.make(CategoryModel, name='a'),
-            baker.make(CategoryModel, name='AAA'),
-            baker.make(CategoryModel, name='AaA'),
-            baker.make(CategoryModel, name='b'),
-            baker.make(CategoryModel, name='C'),
+        faker = Category.fake().a_category()
+
+        entities = [
+            faker.with_name('a').build(),
+            faker.with_name('AAA').build(),
+            faker.with_name('AaA').build(),
+            faker.with_name('b').build(),
+            faker.with_name('C').build(),
         ]
+        
+        self.repo.bulk_insert(entities)
 
         input_param = ListCategoriesUseCase.Input(
             page=1, per_page=2, sort='name', sort_dir='asc', filter='a'
@@ -187,8 +185,8 @@ class TestListCategoriesUseCaseInt(unittest.TestCase):
             output,
             ListCategoriesUseCase.Output(
                 items=[
-                    self.from_model_to_output(models[1]),
-                    self.from_model_to_output(models[2]),
+                    self.from_entity_to_output(entities[1]),
+                    self.from_entity_to_output(entities[2]),
                 ],
                 total=3,
                 current_page=1,
@@ -207,7 +205,7 @@ class TestListCategoriesUseCaseInt(unittest.TestCase):
             output,
             ListCategoriesUseCase.Output(
                 items=[
-                    self.from_model_to_output(models[0]),
+                    self.from_entity_to_output(entities[0]),
                 ],
                 total=3,
                 current_page=2,
@@ -226,8 +224,8 @@ class TestListCategoriesUseCaseInt(unittest.TestCase):
             output,
             ListCategoriesUseCase.Output(
                 items=[
-                    self.from_model_to_output(models[0]),
-                    self.from_model_to_output(models[2]),
+                    self.from_entity_to_output(entities[0]),
+                    self.from_entity_to_output(entities[2]),
                 ],
                 total=3,
                 current_page=1,
@@ -255,58 +253,60 @@ class TestUpdateCategoryUseCaseInt(unittest.TestCase):
         )
 
     def test_execute(self):
-        model = baker.make(CategoryModel)
-        request = UpdateCategoryUseCase.Input(id=model.id, name='test 1')
+        entity = Category.fake().a_category().build()
+        self.repo.insert(entity)
+        
+        request = UpdateCategoryUseCase.Input(id=entity.id, name='test 1')
         response = self.use_case.execute(request)
         self.assertEqual(
             response,
             UpdateCategoryUseCase.Output(
-                id=str(model.id),
+                id=str(entity.id),
                 name='test 1',
                 description=None,
                 is_active=True,
-                created_at=model.created_at,
+                created_at=entity.created_at,
             ),
         )
 
         arrange = [
             {
                 'input': {
-                    'id': str(model.id),
+                    'id': str(entity.id),
                     'name': 'test 2',
                     'description': 'description 2',
                 },
                 'expected': {
-                    'id': str(model.id),
+                    'id': str(entity.id),
                     'name': 'test 2',
                     'description': 'description 2',
                     'is_active': True,
-                    'created_at': model.created_at,
+                    'created_at': entity.created_at,
                 },
             },
             {
                 'input': {
-                    'id': str(model.id),
+                    'id': str(entity.id),
                     'name': 'test 3',
                     'description': 'description 3',
                     'is_active': False,
                 },
                 'expected': {
-                    'id': str(model.id),
+                    'id': str(entity.id),
                     'name': 'test 3',
                     'description': 'description 3',
                     'is_active': False,
-                    'created_at': model.created_at,
+                    'created_at': entity.created_at,
                 },
             },
             {
-                'input': {'id': str(model.id), 'name': 'test 4', 'is_active': True},
+                'input': {'id': str(entity.id), 'name': 'test 4', 'is_active': True},
                 'expected': {
-                    'id': str(model.id),
+                    'id': str(entity.id),
                     'name': 'test 4',
                     'description': None,
                     'is_active': True,
-                    'created_at': model.created_at,
+                    'created_at': entity.created_at,
                 },
             },
         ]
@@ -344,9 +344,11 @@ class TestDeleteCategoryUseCaseInt(unittest.TestCase):
         )
 
     def test_execute(self):
-        model = baker.make(CategoryModel)
-        request = DeleteCategoryUseCase.Input(id=str(model.id))
+        entity = Category.fake().a_category().build()
+        self.repo.insert(entity)
+        
+        request = DeleteCategoryUseCase.Input(id=str(entity.id))
         self.use_case.execute(request)
 
         with self.assertRaises(NotFoundException):
-            self.repo.find_by_id(str(model.id))
+            self.repo.find_by_id(str(entity.id))
