@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from core.category.domain.repositories import CategoryRepository
 from core.category.infra.django_app.api import CategoryResource
 from core.category.tests.fixture.categories_api_fixture import (
-    CategoryAPIFixture,
+    CreateCategoryAPIFixture,
     HttpExpect,
 )
 from django_app import container
@@ -26,7 +26,19 @@ class TestCategoryResourcePostMethodInt:
             }
         )
 
-    @pytest.mark.parametrize('http_expect', CategoryAPIFixture.arrange_for_save())
+    @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_invalid_requests())
+    def test_validation_errors(self, http_expect: HttpExpect):
+        request_factory = APIRequestFactory()
+        _request = request_factory.get('/categories')
+        request = Request(_request)
+        request._full_data = http_expect.request.body
+
+        with pytest.raises(http_expect.exception.__class__) as assert_exception:
+            self.resource.post(request)
+
+        assert assert_exception.value.detail == http_expect.exception.detail
+
+    @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_save())
     def test_method_post(self, http_expect: HttpExpect):
         request_factory = APIRequestFactory()
         _request = request_factory.get('/categories')
@@ -34,7 +46,7 @@ class TestCategoryResourcePostMethodInt:
         request._full_data = http_expect.request.body
         response = self.resource.post(request)
         assert response.status_code == 201
-        assert CategoryAPIFixture.keys_in_category_response() == list(
+        assert CreateCategoryAPIFixture.keys_in_category_response() == list(
             response.data.keys()
         )
 
@@ -42,6 +54,7 @@ class TestCategoryResourcePostMethodInt:
         serialized = CategoryResource.category_to_response(category_created)
         assert response.data == serialized
 
-        expected_data = {**http_expect.request.body, **http_expect.response.body}
+        expected_data = {**http_expect.request.body,
+                         **http_expect.response.body}
         for key, value in expected_data.items():
             assert response.data[key] == value
