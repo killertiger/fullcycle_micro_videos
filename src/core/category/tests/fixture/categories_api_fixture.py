@@ -113,14 +113,23 @@ class CategoryAPIFixture:
                         'name': faker.name,
                     }
                 ),
-                response=Response(
-                    body={'description': None, 'is_active': True}),
+                response=
+                Response(body={
+                    'name': faker.name,
+                    'description': None,
+                    'is_active': True
+                }),
             ),
             HttpExpect(
-                request=Request(
-                    body={'name': faker.name, 'description': faker.description}
-                ),
-                response=Response(body={'is_active': True}),
+                request=Request(body={
+                    'name': faker.name,
+                    'description': faker.description,
+                }),
+                response=Response(body={
+                    'name': faker.name,
+                    'description': faker.description,
+                    'is_active': True
+                }),
             ),
         ]
 

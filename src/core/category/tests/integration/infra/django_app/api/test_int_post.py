@@ -49,7 +49,5 @@ class TestCategoryResourcePostMethodInt:
         serialized = CategoryResource.category_to_response(category_created)
         assert response.data == serialized
 
-        expected_data = {**http_expect.request.body,
-                         **http_expect.response.body}
-        for key, value in expected_data.items():
+        for key, value in http_expect.response.body.items():
             assert response.data[key] == value
