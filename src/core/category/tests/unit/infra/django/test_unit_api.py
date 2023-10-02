@@ -5,6 +5,7 @@ from unittest import mock
 from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 from core.__seedwork.infra.django_app.serializers import UUIDSerializer
+from core.__seedwork.infra.testing.helpers import make_request
 from core.category.application.dto import CategoryOutput
 from core.category.infra.django_app.serializer import CategorySerializer
 from core.category.application.use_cases import (
@@ -16,6 +17,7 @@ from core.category.application.use_cases import (
 )
 from core.category.infra.django_app.api import CategoryResource
 from core.category.tests.helpers import init_category_resource_all_none
+
 
 
 class StubCategorySerializer:
@@ -84,9 +86,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
                 }
             )
 
-            _request = APIRequestFactory().post("", send_data)
-            request = Request(_request)
-            request._full_data = send_data
+            request = make_request(http_method='post', send_data=send_data)
 
             response = resource.post(request)
 
@@ -276,9 +276,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
             }
         )
 
-        _request = APIRequestFactory().put("/", send_data)
-        request = Request(_request)
-        request._full_data = send_data
+        request = make_request('put', send_data=send_data)
 
         response = resource.put(request, send_data["id"])
 

@@ -68,7 +68,7 @@ class CategoryResource(APIView):
         output = self.update_use_case().execute(input_param)
         body = CategoryResource.category_to_response(output)
 
-        return Response(body, http_status.HTTP_201_CREATED)
+        return Response(body, http_status.HTTP_200_OK)
 
     def delete(self, _request: Request, id: str):
         CategoryResource.validate_id(id)
