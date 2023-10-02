@@ -5,6 +5,22 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/__pypackages__/3.11/lib"
     ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.indexing": true,
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "djanto",
+            "depth": 10
+        },
+        {
+            "name": "rest_framework",
+            "depth": 10
+        },
+        {
+            "name": "core",
+            "depth": 10
+        },
+    ],
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#65c89b",
         "activityBar.background": "#65c89b",
