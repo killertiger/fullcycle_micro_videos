@@ -9,7 +9,7 @@ from core.category.tests.fixture.categories_api_fixture import (
     HttpExpect,
 )
 from core.category.tests.helpers import init_category_resource_all_none
-from core.__seedwork.infra.testing.helpers import make_request
+from core.__seedwork.infra.testing.helpers import assert_response_data, make_request
 
 
 @pytest.mark.django_db
@@ -49,5 +49,4 @@ class TestCategoryResourcePostMethodInt:
         serialized = CategoryResource.category_to_response(category_created)
         assert response.data == serialized
 
-        for key, value in http_expect.response.body.items():
-            assert response.data[key] == value
+        assert_response_data(response.data, http_expect.response.body)

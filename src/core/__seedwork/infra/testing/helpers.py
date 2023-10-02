@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 from django.http.request import HttpRequest
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
@@ -10,3 +10,7 @@ def make_request(http_method: str, url: str = '/', send_data: Any = None) -> Req
     request = Request(http_request)
     request._full_data = send_data
     return request
+
+def assert_response_data(response_data: Dict, expected_data: Dict):
+    for key, value in expected_data.items():
+        assert response_data[key] == value
