@@ -1,7 +1,9 @@
+from core.category.infra.django_app.serializer import CategorySerializer
 import pytest
 from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 from django_app import container
+from unittest.mock import patch, PropertyMock
 from core.category.domain.repositories import CategoryRepository
 from core.category.infra.django_app.api import CategoryResource
 from core.category.tests.fixture.categories_api_fixture import (
@@ -28,17 +30,32 @@ class TestCategoryResourcePostMethodInt:
         )
 
     @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_invalid_requests())
-    def test_validation_errors(self, http_expect: HttpExpect):
-        request = make_request(http_method='post', send_data=http_expect.request.body)
+    def test_invalid_request(self, http_expect: HttpExpect):
+        request = make_request(
+            http_method='post', send_data=http_expect.request.body)
 
         with pytest.raises(http_expect.exception.__class__) as assert_exception:
             self.resource.post(request)
 
         assert assert_exception.value.detail == http_expect.exception.detail
 
+    def test_entity_validation_error(self):
+        send_data = {'name': None}
+
+        with (
+            patch.object(CategorySerializer, 'is_valid') as mock_is_valid,
+            patch.object(CategorySerializer,
+                         'validated_data',
+                         new_callable=PropertyMock,
+                         return_value=send_data) as mock_errors,
+        ):
+            request = make_request(http_method='post', send_data=send_data)
+            response = self.resource.post(request)
+
     @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_save())
     def test_method_post(self, http_expect: HttpExpect):
-        request = make_request(http_method='post', send_data=http_expect.request.body)
+        request = make_request(
+            http_method='post', send_data=http_expect.request.body)
         response = self.resource.post(request)
         assert response.status_code == 201
         assert CreateCategoryAPIFixture.keys_in_category_response() == list(
