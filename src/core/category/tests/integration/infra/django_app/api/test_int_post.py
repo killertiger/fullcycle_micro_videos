@@ -39,18 +39,22 @@ class TestCategoryResourcePostMethodInt:
 
         assert assert_exception.value.detail == http_expect.exception.detail
 
-    def test_entity_validation_error(self):
-        send_data = {'name': None}
-
+    @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_entity_validation_errors())
+    def test_entity_validation_error(self, http_expect: HttpExpect):
         with (
             patch.object(CategorySerializer, 'is_valid') as mock_is_valid,
             patch.object(CategorySerializer,
                          'validated_data',
                          new_callable=PropertyMock,
-                         return_value=send_data) as mock_errors,
+                         return_value=http_expect.request.body) as mock_validated_data,
         ):
-            request = make_request(http_method='post', send_data=send_data)
-            response = self.resource.post(request)
+            request = make_request(http_method='post', send_data=http_expect.request.body)
+            
+            with pytest.raises(http_expect.exception.__class__) as assert_exception:
+                self.resource.post(request)
+            mock_is_valid.assert_called()
+            mock_validated_data.assert_called()
+            assert assert_exception.value.error == http_expect.exception.error
 
     @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_save())
     def test_method_post(self, http_expect: HttpExpect):
