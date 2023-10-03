@@ -149,37 +149,49 @@ class CategoryEntityValidationErrorFixture:
             ),
             description_not_a_str=HttpExpect(
                 request=Request(
-                    body={'description': faker.with_invalid_description_not_string().description}
+                    body={
+                        'name': faker.with_invalid_name_none().name,
+                        'description': faker.with_invalid_description_not_string().description
+                    }
                 ),
-                exception=ValidationError({
-                    # 'name': [ErrorDetail('This field is required.', 'required')],
+                exception=EntityValidationException({
+                    'name': ['This field may not be null.'],
                     'description': ['Not a valid string.']
                 })
             ),
             is_active_none=HttpExpect(
                 request=Request(
-                        body={'is_active': faker.with_invalid_is_active_none().is_active}
+                        body={
+                            'name': faker.with_invalid_name_none().name,
+                            'is_active': faker.with_invalid_is_active_none().is_active
+                        }
                     ),
-                exception=ValidationError({
-                    # 'name': [ErrorDetail('This field is required.', 'required')],
+                exception=EntityValidationException({
+                    'name': ['This field may not be null.'],
                     'is_active': ['This field may not be null.']
                 })
             ),
             is_active_empty=HttpExpect(
                 request=Request(
-                        body={'is_active': faker.with_invalid_is_active_empty().is_active}
+                        body={
+                            'name': faker.with_invalid_name_none().name,
+                            'is_active': faker.with_invalid_is_active_empty().is_active
+                        }
                     ),
-                exception=ValidationError({
-                    # 'name': [ErrorDetail('This field is required.', 'required')],
+                exception=EntityValidationException({
+                    'name': ['This field may not be null.'],
                     'is_active': ['Must be a valid boolean.']
                 })
             ),
             is_active_not_a_bool=HttpExpect(
                 request=Request(
-                        body={'is_active': faker.with_invalid_is_active_not_boolean().is_active}
+                        body={
+                            'name': faker.with_invalid_name_none().name,
+                            'is_active': faker.with_invalid_is_active_not_boolean().is_active
+                        }
                     ),
-                exception=ValidationError({
-                    # 'name': [ErrorDetail('This field is required.', 'required')],
+                exception=EntityValidationException({
+                    'name': ['This field may not be null.'],
                     'is_active': ['Must be a valid boolean.']
                 })
             ),
@@ -248,6 +260,7 @@ class CreateCategoryAPIFixture:
             pytest.param(fixture.name_empty, id='name_empty'),
             pytest.param(fixture.name_not_a_str, id='name_not_a_str'),
             pytest.param(fixture.name_too_long, id='name_too_long'),
+            pytest.param(fixture.description_not_a_str, id='description_not_a_str'),
             pytest.param(fixture.is_active_none, id='is_active_none'),
             pytest.param(fixture.is_active_empty, id='is_active_empty'),
             pytest.param(fixture.is_active_not_a_bool, id='is_active_not_a_bool'),

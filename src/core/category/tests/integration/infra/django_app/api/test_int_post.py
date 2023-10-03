@@ -29,27 +29,34 @@ class TestCategoryResourcePostMethodInt:
             }
         )
 
-    @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_invalid_requests())
+    @pytest.mark.parametrize(
+        'http_expect', CreateCategoryAPIFixture.arrange_for_invalid_requests()
+    )
     def test_invalid_request(self, http_expect: HttpExpect):
-        request = make_request(
-            http_method='post', send_data=http_expect.request.body)
+        request = make_request(http_method='post', send_data=http_expect.request.body)
 
         with pytest.raises(http_expect.exception.__class__) as assert_exception:
             self.resource.post(request)
 
         assert assert_exception.value.detail == http_expect.exception.detail
 
-    @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_entity_validation_errors())
+    @pytest.mark.parametrize(
+        'http_expect', CreateCategoryAPIFixture.arrange_for_entity_validation_errors()
+    )
     def test_entity_validation_error(self, http_expect: HttpExpect):
         with (
             patch.object(CategorySerializer, 'is_valid') as mock_is_valid,
-            patch.object(CategorySerializer,
-                         'validated_data',
-                         new_callable=PropertyMock,
-                         return_value=http_expect.request.body) as mock_validated_data,
+            patch.object(
+                CategorySerializer,
+                'validated_data',
+                new_callable=PropertyMock,
+                return_value=http_expect.request.body,
+            ) as mock_validated_data,
         ):
-            request = make_request(http_method='post', send_data=http_expect.request.body)
-            
+            request = make_request(
+                http_method='post', send_data=http_expect.request.body
+            )
+
             with pytest.raises(http_expect.exception.__class__) as assert_exception:
                 self.resource.post(request)
             mock_is_valid.assert_called()
@@ -58,8 +65,7 @@ class TestCategoryResourcePostMethodInt:
 
     @pytest.mark.parametrize('http_expect', CreateCategoryAPIFixture.arrange_for_save())
     def test_method_post(self, http_expect: HttpExpect):
-        request = make_request(
-            http_method='post', send_data=http_expect.request.body)
+        request = make_request(http_method='post', send_data=http_expect.request.body)
         response = self.resource.post(request)
         assert response.status_code == 201
         assert CreateCategoryAPIFixture.keys_in_category_response() == list(
