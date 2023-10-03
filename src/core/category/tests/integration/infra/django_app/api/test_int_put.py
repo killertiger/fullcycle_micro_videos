@@ -1,3 +1,4 @@
+from core.category.domain.entities import Category
 from core.category.infra.django_app.serializer import CategorySerializer
 import pytest
 from rest_framework.test import APIRequestFactory
@@ -25,7 +26,7 @@ class TestCategoryResourcePutMethodInt:
         cls.resource = CategoryResource(
             **{
                 **init_category_resource_all_none(),
-                'create_use_case': container.use_case_category_update_category,
+                'update_use_case': container.use_case_category_update_category,
             }
         )
 
@@ -45,6 +46,9 @@ class TestCategoryResourcePutMethodInt:
         'http_expect', UpdateCategoryAPIFixture.arrange_for_entity_validation_errors()
     )
     def test_entity_validation_error(self, http_expect: HttpExpect):
+        category = Category.fake().a_category().build()
+        self.repo.insert(category)
+        
         with (
             patch.object(CategorySerializer, 'is_valid') as mock_is_valid,
             patch.object(
@@ -59,7 +63,7 @@ class TestCategoryResourcePutMethodInt:
             )
 
             with pytest.raises(http_expect.exception.__class__) as assert_exception:
-                self.resource.put(request)
+                self.resource.put(request, category.id)
             mock_is_valid.assert_called()
             mock_validated_data.assert_called()
             assert assert_exception.value.error == http_expect.exception.error
