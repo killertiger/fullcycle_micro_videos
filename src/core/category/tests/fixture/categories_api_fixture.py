@@ -273,3 +273,40 @@ class CreateCategoryAPIFixture:
     @staticmethod
     def arrange_for_save():
         return CategoryAPIFixture.arrange_for_save()
+
+
+class UpdateCategoryAPIFixture:
+    
+    @staticmethod
+    def arrange_for_invalid_requests():
+        fixture = CategoryInvalidBodyFixture.arrange()
+        return [
+            pytest.param(fixture.body_empty, id='body_empty'),
+            pytest.param(fixture.name_none, id='name_none'),
+            pytest.param(fixture.name_empty, id='name_empty'),
+            pytest.param(fixture.is_active_none, id='is_active_none'),
+            pytest.param(fixture.is_active_empty, id='is_active_empty'),
+            pytest.param(fixture.is_active_not_a_bool, id='is_active_not_a_bool'),
+        ]
+    
+    @staticmethod
+    def arrange_for_entity_validation_errors():
+        fixture = CategoryEntityValidationErrorFixture.arrange()
+        return [
+            pytest.param(fixture.name_none, id='name_none'),
+            pytest.param(fixture.name_empty, id='name_empty'),
+            pytest.param(fixture.name_not_a_str, id='name_not_a_str'),
+            pytest.param(fixture.name_too_long, id='name_too_long'),
+            pytest.param(fixture.description_not_a_str, id='description_not_a_str'),
+            pytest.param(fixture.is_active_none, id='is_active_none'),
+            pytest.param(fixture.is_active_empty, id='is_active_empty'),
+            pytest.param(fixture.is_active_not_a_bool, id='is_active_not_a_bool'),
+        ]
+    
+    @staticmethod
+    def keys_in_category_response():
+        return CategoryAPIFixture.keys_in_category_response()
+
+    @staticmethod
+    def arrange_for_save():
+        return CategoryAPIFixture.arrange_for_save()
