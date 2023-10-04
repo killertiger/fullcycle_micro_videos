@@ -89,9 +89,12 @@ class TestCategoryResourcePutMethodInt:
 
     @pytest.mark.parametrize('http_expect', UpdateCategoryAPIFixture.arrange_for_save())
     def test_method_put(self, http_expect: HttpExpect):
+        category = Category.fake().a_category().build()
+        self.repo.insert(category)
+        
         request = make_request(http_method='put', send_data=http_expect.request.body)
-        response = self.resource.put(request)
-        assert response.status_code == 201
+        response = self.resource.put(request, category.id)
+        assert response.status_code == 200
         assert UpdateCategoryAPIFixture.keys_in_category_response() == list(
             response.data.keys()
         )

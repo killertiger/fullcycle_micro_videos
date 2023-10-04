@@ -19,7 +19,6 @@ from core.category.infra.django_app.api import CategoryResource
 from core.category.tests.helpers import init_category_resource_all_none
 
 
-
 class StubCategorySerializer:
     validated_data = None
 
@@ -36,21 +35,16 @@ class TestCategoryResourceUnit(unittest.TestCase):
         data = CategoryResource.category_to_response('output')
         mock_serializer.assert_called_with(CategorySerializer, instance='output')
         self.assertEqual(data, 'test')
-        
-    @mock.patch.object(UUIDSerializer, '__new__')    
+
+    @mock.patch.object(UUIDSerializer, '__new__')
     def test_validate_id_method(self, mock_serializer):
         mock_serializer_is_valid = mock.MagicMock()
-        mock_serializer.return_value = namedtuple(
-            'Fake', ['is_valid'])\
-                (is_valid=mock_serializer_is_valid)
+        mock_serializer.return_value = namedtuple('Fake', ['is_valid'])(
+            is_valid=mock_serializer_is_valid
+        )
         CategoryResource.validate_id('fake id')
-        mock_serializer.assert_called_with(
-            UUIDSerializer,
-            data={'id': 'fake id'}
-        )
-        mock_serializer_is_valid.assert_called_with(
-            raise_exception=True
-        )
+        mock_serializer.assert_called_with(UUIDSerializer, data={'id': 'fake id'})
+        mock_serializer_is_valid.assert_called_with(raise_exception=True)
 
     @mock.patch.object(CategoryResource, 'category_to_response')
     def test_post_method(self, mock_category_to_response):
@@ -149,7 +143,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
             )
         )
         self.assertEqual(response.status_code, 200)
-        
+
         # self.assertEqual(
         #     response.data,
         #     {
@@ -173,17 +167,19 @@ class TestCategoryResourceUnit(unittest.TestCase):
 
     @mock.patch.object(CategoryResource, 'category_to_response')
     @mock.patch.object(CategoryResource, 'validate_id')
-    def test_if_get_invoke_get_object(self, mock_validate_id, mock_category_to_response):
+    def test_if_get_invoke_get_object(
+        self, mock_validate_id, mock_category_to_response
+    ):
         mock_get_use_case = mock.Mock(GetCategoryUseCase)
         mock_list_use_case = mock.Mock(ListCategoriesUseCase)
         uuid_value = 'fc98cf57-4615-4b0a-b5eb-373870ca27ce'
-        
+
         expected_response = {
             'id': uuid_value,
             'name': 'Movie',
             'description': None,
             'is_active': True,
-            'created_at': datetime.now()
+            'created_at': datetime.now(),
         }
 
         mock_get_use_case.execute.return_value = GetCategoryUseCase.Output(
@@ -208,7 +204,9 @@ class TestCategoryResourceUnit(unittest.TestCase):
         mock_get_use_case.execute.assert_called_with(
             GetCategoryUseCase.Input(id=uuid_value)
         )
-        mock_category_to_response.assert_called_with(mock_get_use_case.execute.return_value)
+        mock_category_to_response.assert_called_with(
+            mock_get_use_case.execute.return_value
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data,
@@ -252,11 +250,15 @@ class TestCategoryResourceUnit(unittest.TestCase):
                 "name": "Movie",
                 "description": None,
                 "is_active": True,
-                "created_at": mock_get_use_case.execute.return_value.items[0].created_at,
+                "created_at": mock_get_use_case.execute.return_value.items[
+                    0
+                ].created_at,
             },
         )
 
-    def test_update_method(self):
+    @mock.patch.object(CategoryResource, 'category_to_response')
+    @mock.patch.object(CategoryResource, 'validate_id')
+    def test_update_method(self, mock_validate_id, mock_category_to_response):
         send_data = {"id": "fc98cf57-4615-4b0a-b5eb-373870ca27ce", "name": "Movie"}
 
         mock_update_use_case = mock.Mock(UpdateCategoryUseCase)
@@ -269,6 +271,16 @@ class TestCategoryResourceUnit(unittest.TestCase):
             created_at=datetime.now(),
         )
 
+        expected_response = {
+            "id": send_data["id"],
+            "name": send_data["name"],
+            "description": None,
+            "is_active": True,
+            "created_at": mock_update_use_case.execute.return_value.created_at,
+        }
+        
+        mock_category_to_response.return_value = expected_response
+        
         resource = CategoryResource(
             **{
                 **init_category_resource_all_none(),
@@ -280,6 +292,12 @@ class TestCategoryResourceUnit(unittest.TestCase):
 
         response = resource.put(request, send_data["id"])
 
+        mock_validate_id.assert_called_with(send_data["id"])
+
+        mock_category_to_response.assert_called_with(
+            mock_update_use_case.execute.return_value
+        )
+
         mock_update_use_case.execute.assert_called_with(
             UpdateCategoryUseCase.Input(
                 id=send_data["id"],
@@ -288,19 +306,12 @@ class TestCategoryResourceUnit(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data,
-            {
-                "id": send_data["id"],
-                "name": send_data["name"],
-                "description": None,
-                "is_active": True,
-                "created_at": mock_update_use_case.execute.return_value.created_at,
-            },
-        )
+        self.assertEqual(response.data, expected_response)
 
-    def test_delete_method(self):
+    @mock.patch.object(CategoryResource, 'validate_id')
+    def test_delete_method(self, mock_validate_id):
         mock_delete_use_case = mock.Mock(DeleteCategoryUseCase)
+        uuid_value = 'fc98cf57-4615-4b0a-b5eb-373870ca27ce'
 
         resource = CategoryResource(
             **{
@@ -312,10 +323,12 @@ class TestCategoryResourceUnit(unittest.TestCase):
         _request = APIRequestFactory().delete("/")
         request = Request(_request)
 
-        response = resource.delete(request, "fc98cf57-4615-4b0a-b5eb-373870ca27ce")
+        response = resource.delete(request, uuid_value)
 
+        mock_validate_id.assert_called_with(uuid_value)
+        
         mock_delete_use_case.execute.assert_called_with(
-            DeleteCategoryUseCase.Input(id="fc98cf57-4615-4b0a-b5eb-373870ca27ce")
+            DeleteCategoryUseCase.Input(id=uuid_value)
         )
 
         self.assertEqual(response.status_code, 204)
