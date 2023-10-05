@@ -1,5 +1,9 @@
+from collections import namedtuple
+from curses import meta
+from html import entities
 from typing import Any, Optional
 from dataclasses import dataclass
+import datetime
 import pytest
 from rest_framework.exceptions import ValidationError, ErrorDetail
 from core.category.domain.entities import Category
@@ -377,3 +381,134 @@ class UpdateCategoryAPIFixture:
         ]
 
         return [pytest.param(item, id=str(item.request.body)) for item in data]
+
+
+@dataclass
+class SearchExpectation:
+    send_data: dict
+    expected: 'SearchExpectation.Expected'
+    entities: list
+
+    @dataclass
+    class Expected:
+        entities: list
+        meta: dict
+
+
+class ListCategoriesApiFixture:
+    @staticmethod
+    def arrange_incremented_with_created_at():
+        with_created_at_faker = lambda index: datetime.datetime.now(
+            datetime.timezone.utc
+        ) + datetime.timedelta(days=index)
+
+        categories = (
+            Category.fake()
+            .the_categories(4)
+            .with_created_at(with_created_at_faker)
+            .build()
+        )
+
+        CategoriesNamed = namedtuple(
+            'CategoriesNamed', ['first', 'second', 'third', 'fourth']
+        )
+        categories_named = CategoriesNamed(
+            first=categories[0],
+            second=categories[1],
+            third=categories[2],
+            fourth=categories[3],
+        )
+
+        arrange = [
+            SearchExpectation(
+                send_data={},
+                expected=SearchExpectation.Expected(
+                    entities=[
+                        categories_named.fourth,
+                        categories_named.third,
+                        categories_named.second,
+                        categories_named.first,
+                    ],
+                    meta={
+                        'current_page': 1,
+                        'per_page': 15,
+                        'last_page': 1,
+                        'total': 4,
+                    },
+                ),
+                entities=categories,
+            ),
+            SearchExpectation(
+                send_data={'page': 1, 'per_page': 2},
+                expected=SearchExpectation.Expected(
+                    entities=[categories_named.fourth, categories_named.third],
+                    meta={'current_page': 1, 'per_page': 2, 'last_page': 2, 'total': 4},
+                ),
+                entities=categories,
+            ),
+            SearchExpectation(
+                send_data={'page': 2, 'per_page': 2},
+                expected=SearchExpectation.Expected(
+                    entities=[categories_named.second, categories_named.first],
+                    meta={'current_page': 2, 'per_page': 2, 'last_page': 2, 'total': 4},
+                ),
+                entities=categories,
+            ),
+        ]
+
+        return [
+            pytest.param(item, id=f'send_data={str(item.send_data)}')
+            for item in arrange
+        ]
+
+    @staticmethod
+    def arrange_unsorted():
+        faker = Category.fake().a_category()
+        categories = [
+            faker.with_name('a').build(),
+            faker.with_name('AAA').build(),
+            faker.with_name('AaA').build(),
+            faker.with_name('b').build(),
+            faker.with_name('c').build(),
+        ]
+        CategoriesNamed = namedtuple('CategoriesNamed', ['a', 'AAA', 'AaA', 'b', 'c'])
+        categories_named = CategoriesNamed(
+            a=categories[0],
+            AAA=categories[1],
+            AaA=categories[2],
+            b=categories[3],
+            c=categories[4],
+        )
+        arrange = [
+            SearchExpectation(
+                send_data={'page': 1, 'per_page': 2, 'sort': 'name', 'filter': 'a'},
+                expected=SearchExpectation.Expected(
+                    entities=[categories_named.AAA, categories_named.AaA],
+                    meta={
+                        'total': 3,
+                        'current_page': 1,
+                        'last_page': 2,
+                        'per_page': 2
+                    }
+                ),
+                entities=categories,
+            ),
+            SearchExpectation(
+                send_data={'page': 2, 'per_page': 2, 'sort': 'name', 'filter': 'a'},
+                expected=SearchExpectation.Expected(
+                    entities=[categories_named.a],
+                    meta={
+                        'total': 3,
+                        'current_page': 2,
+                        'last_page': 2,
+                        'per_page': 2
+                    }
+                ),
+                entities=categories,
+            )
+        ]
+        
+        return [
+            pytest.param(item, id=f'send_data={str(item.send_data)}')
+            for item in arrange
+        ]
