@@ -23,11 +23,13 @@ class TestCategoryResourceCommonMethodsInt:
         )
         data = CategoryResource.category_to_response(output)
         assert data == {
-            'id': 'fake id',
-            'name': 'category test',
-            'description': 'description test',
-            'is_active': True,
-            'created_at': f'{output.created_at.isoformat()[:-6]}Z',
+            'data': {
+                'id': 'fake id',
+                'name': 'category test',
+                'description': 'description test',
+                'is_active': True,
+                'created_at': f'{output.created_at.isoformat()[:-6]}Z',
+            }
         }
 
     def test_validate_id(self):

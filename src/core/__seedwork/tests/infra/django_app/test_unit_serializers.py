@@ -5,6 +5,7 @@ from core.__seedwork.infra.django_app.serializers import (
     CollectionSerializer,
     PaginationSerializer,
     PaginationOutput,
+    ResourceSerializer,
 )
 
 
@@ -23,7 +24,7 @@ class TestPaginationSerializer(unittest.TestCase):
         )
 
 
-class StubSerializer(serializers.Serializer):
+class StubSerializer(ResourceSerializer):
     name = serializers.CharField()
 
 

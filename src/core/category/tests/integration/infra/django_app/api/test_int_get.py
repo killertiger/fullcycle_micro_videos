@@ -53,4 +53,4 @@ class TestCategoryResourceGetMethodInt:
         }
         
     def serialize_category(self, category: Category):
-        return CategoryResource.category_to_response(category)
+        return CategoryResource.category_to_response(category)['data']

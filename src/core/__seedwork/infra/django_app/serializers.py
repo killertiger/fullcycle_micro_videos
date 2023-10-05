@@ -13,6 +13,12 @@ class PaginationSerializer(serializers.Serializer):
     last_page = serializers.IntegerField()
 
 
+class ResourceSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return {'data': data}
+
+
 class CollectionSerializer(serializers.ListSerializer):
     pagination: PaginationOutput
     many = False
@@ -27,8 +33,10 @@ class CollectionSerializer(serializers.ListSerializer):
         super().__init__(**kwargs)
 
     def to_representation(self, data):
-        data = super().to_representation(data)
-        return {'data': data, 'meta': PaginationSerializer(self.pagination).data}
+        return {
+            'data': [self.child.to_representation(item)['data'] for item in data],
+            'meta': PaginationSerializer(self.pagination).data,
+        }
 
     @property
     def data(self):

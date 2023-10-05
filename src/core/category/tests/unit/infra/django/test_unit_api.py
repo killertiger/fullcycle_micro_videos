@@ -1,5 +1,6 @@
 from collections import namedtuple
 from datetime import datetime
+from typing import OrderedDict
 import unittest
 from unittest import mock
 from rest_framework.test import APIRequestFactory
@@ -219,7 +220,8 @@ class TestCategoryResourceUnit(unittest.TestCase):
         resource.get(None, "fc98cf57-4615-4b0a-b5eb-373870ca27ce")
         resource.get_object.assert_called_once()
 
-    def test_get_method(self):
+    @mock.patch.object(CategoryResource, 'category_to_response')
+    def test_get_method(self, mock_category_to_response):
         mock_get_use_case = mock.Mock(GetCategoryUseCase)
 
         mock_get_use_case.execute.return_value = GetCategoryUseCase.Output(
@@ -229,6 +231,16 @@ class TestCategoryResourceUnit(unittest.TestCase):
             is_active=True,
             created_at=datetime.now(),
         )
+
+        expected_response = {
+            "id": "fc98cf57-4615-4b0a-b5eb-373870ca27ce",
+            "name": "Movie",
+            "description": None,
+            "is_active": True,
+            "created_at": mock_get_use_case.execute.return_value.created_at,
+        }
+
+        mock_category_to_response.return_value = expected_response
 
         resource = CategoryResource(
             **{
@@ -243,18 +255,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
             GetCategoryUseCase.Input(id="fc98cf57-4615-4b0a-b5eb-373870ca27ce")
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data,
-            {
-                "id": "fc98cf57-4615-4b0a-b5eb-373870ca27ce",
-                "name": "Movie",
-                "description": None,
-                "is_active": True,
-                "created_at": mock_get_use_case.execute.return_value.items[
-                    0
-                ].created_at,
-            },
-        )
+        self.assertEqual(response.data, expected_response)
 
     @mock.patch.object(CategoryResource, 'category_to_response')
     @mock.patch.object(CategoryResource, 'validate_id')
@@ -278,9 +279,9 @@ class TestCategoryResourceUnit(unittest.TestCase):
             "is_active": True,
             "created_at": mock_update_use_case.execute.return_value.created_at,
         }
-        
+
         mock_category_to_response.return_value = expected_response
-        
+
         resource = CategoryResource(
             **{
                 **init_category_resource_all_none(),
@@ -326,7 +327,7 @@ class TestCategoryResourceUnit(unittest.TestCase):
         response = resource.delete(request, uuid_value)
 
         mock_validate_id.assert_called_with(uuid_value)
-        
+
         mock_delete_use_case.execute.assert_called_with(
             DeleteCategoryUseCase.Input(id=uuid_value)
         )

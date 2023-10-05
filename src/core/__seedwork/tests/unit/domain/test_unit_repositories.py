@@ -22,7 +22,7 @@ class TestRepositoryInterface(unittest.TestCase):
             RepositoryInterface()  # pylint: disable=abstract-class-instantiated
         self.assertEqual(assert_error.exception.args[0],
                          "Can't instantiate abstract class RepositoryInterface with abstract " +
-                         "methods delete, find_all, find_by_id, insert, update"
+                         "methods bulk_insert, delete, find_all, find_by_id, insert, update"
                          )
 
 
@@ -141,7 +141,7 @@ class TestSearchableRepositoryInterface(unittest.TestCase):
             SearchableRepositoryInterface()  # pylint: disable=abstract-class-instantiated
         self.assertEqual(assert_error.exception.args[0],
                          "Can't instantiate abstract class SearchableRepositoryInterface " +
-                         "with abstract methods delete, find_all, find_by_id, insert, " +
+                         "with abstract methods bulk_insert, delete, find_all, find_by_id, insert, " +
                          "search, update"
                          )
 

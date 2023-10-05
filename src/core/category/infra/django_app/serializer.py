@@ -1,9 +1,9 @@
 from rest_framework import serializers, ISO_8601
 from rest_framework.fields import empty
-from core.__seedwork.infra.django_app.serializers import CollectionSerializer
+from core.__seedwork.infra.django_app.serializers import CollectionSerializer, ResourceSerializer
 
 
-class CategorySerializer(serializers.Serializer):
+class CategorySerializer(ResourceSerializer):
     id = serializers.UUIDField(read_only=True)
     name = serializers.CharField()
     description = serializers.CharField(required=False, allow_null=True)

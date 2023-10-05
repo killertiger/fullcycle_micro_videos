@@ -95,12 +95,21 @@ class TestCategoryResourcePutMethodInt:
         request = make_request(http_method='put', send_data=http_expect.request.body)
         response = self.resource.put(request, category.id)
         assert response.status_code == 200
+        assert 'data' in response.data
+        
+        response_data = response.data['data']
         assert UpdateCategoryAPIFixture.keys_in_category_response() == list(
-            response.data.keys()
+            response_data.keys()
         )
 
-        category_created = self.repo.find_by_id(response.data['id'])
-        serialized = CategoryResource.category_to_response(category_created)
+        category_updated = self.repo.find_by_id(response_data['id'])
+        serialized = CategoryResource.category_to_response(category_updated)
         assert response.data == serialized
-
-        assert_response_data(response.data, http_expect.response.body)
+        
+        assert response.data == {
+            'data': {
+                **http_expect.response.body,
+                'id': category_updated.id,
+                'created_at': serialized['data']['created_at']
+            }
+        }
