@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError, ErrorDetail
 from core.category.application.dto import CategoryOutput
 from core.category.infra.django_app.api import CategoryResource
 from core.category.tests.helpers import init_category_resource_all_none
+from core.__seedwork.infra.django_app.serializers import ISO_8601
 
 
 class TestCategoryResourceCommonMethodsInt:
@@ -28,7 +29,7 @@ class TestCategoryResourceCommonMethodsInt:
                 'name': 'category test',
                 'description': 'description test',
                 'is_active': True,
-                'created_at': f'{output.created_at.isoformat()[:-6]}Z',
+                'created_at': output.created_at.strftime(ISO_8601),
             }
         }
 

@@ -1,6 +1,6 @@
-from rest_framework import serializers, ISO_8601
+from rest_framework import serializers
 from rest_framework.fields import empty
-from core.__seedwork.infra.django_app.serializers import CollectionSerializer, ResourceSerializer
+from core.__seedwork.infra.django_app.serializers import CollectionSerializer, ResourceSerializer, ISO_8601
 
 
 class CategorySerializer(ResourceSerializer):

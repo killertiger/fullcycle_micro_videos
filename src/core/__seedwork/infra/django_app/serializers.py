@@ -1,6 +1,7 @@
-from rest_framework import serializers
+from rest_framework import ISO_8601, serializers
 from core.__seedwork.application.dto import PaginationOutput
 
+ISO_8601 = '%Y-%m-%dT%H:%M:%S'
 
 class UUIDSerializer(serializers.Serializer):
     id = serializers.UUIDField()
