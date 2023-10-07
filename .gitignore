@@ -162,3 +162,6 @@ cython_debug/
 .history/
 .docker/zsh/history
 __coverage/
+env/.env
+env/.env.test
+env/.env.e2e
