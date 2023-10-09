@@ -13,3 +13,8 @@ pdm run test
 pdm run test_cov
 pdm run test_cov_html
 ```
+
+Add package
+```
+pdm add package-name
+```
