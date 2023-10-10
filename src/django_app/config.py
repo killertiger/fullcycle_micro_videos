@@ -15,6 +15,7 @@ class ConfigService(BaseSettings):
     debug: bool = False
     installed_apps: List[str]
     language_code: str = 'en-us'
+    middlewares_additional: List[str]
     secret_key: str
 
     
