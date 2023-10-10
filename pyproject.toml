@@ -39,4 +39,5 @@ runserver = "pdm run manage runserver 0.0.0.0:8000"
 test = "pytest --ignore __pypackages__"
 test_cov = "pdm run test --cov ./src --cov-fail-under 80"
 test_cov_html = "pdm run test_cov --cov-report html:./__coverage"
+test_e2e = "pdm run test --ignore __pypackages__ --group e2e"
 

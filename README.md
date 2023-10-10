@@ -26,6 +26,10 @@ docker compose --profile dev up
 
 Execute specific test with E2E env
 ```
+pdm run test_e2e
+```
+or
+```
 APP_ENV=e2e pytest src/core/category/tests/e2e/categories/test_e2e_post.py
 ```
 or

@@ -10,6 +10,12 @@ def pytest_addoption(parser: pytest.Parser):
         default='test',
         help="run tests using the specified env file from /envs folder",
     )
+    parser.addoption(
+        '--group',
+        action='store',
+        default=None,
+        help="run tests only from the specified group",
+    )
     
 @pytest.hookimpl(tryfirst=True)
 def pytest_load_initial_conftests(
@@ -23,3 +29,13 @@ def pytest_load_initial_conftests(
     print(
         f"{Fore.BLUE}\n\n**** Running tests only using .env.{env} **** \n\n{Style.RESET_ALL}"
     )
+
+
+def pytest_runtest_setup(item: pytest.Item):
+    group_mark = item.get_closest_marker('group')
+    
+    group_option = item.config.getoption('--group')
+    
+    if group_option:
+        if group_mark is None or group_option not in group_mark.args:
+            pytest.skip(f'test requires group {group_option}')
