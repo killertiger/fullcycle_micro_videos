@@ -18,3 +18,8 @@ Add package
 ```
 pdm add package-name
 ```
+
+Run dev containers
+```
+docker compose --profile dev up
+```
