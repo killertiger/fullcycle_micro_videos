@@ -40,3 +40,7 @@ $ docker compose exec db_test bash
 $ mysql -uroot -proot
 $ show databases;
 ```
+
+
+## Libraries:
+Colorama - Colored output

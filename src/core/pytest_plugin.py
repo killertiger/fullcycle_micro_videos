@@ -1,6 +1,7 @@
 from typing import List
 import os
 import pytest
+from colorama import Fore, Style
 
 def pytest_addoption(parser: pytest.Parser):
     parser.addoption(
@@ -19,3 +20,6 @@ def pytest_load_initial_conftests(
     parser_args = parser.parse_known_args(args)
     env = parser_args.env
     os.environ.setdefault('APP_ENV', env)
+    print(
+        f"{Fore.BLUE}\n\n**** Running tests only using .env.{env} **** \n\n{Style.RESET_ALL}"
+    )

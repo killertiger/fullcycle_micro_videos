@@ -6,7 +6,7 @@ groups = ["default", "dev"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:feb9e1d19b1679ab59199bf3ca4dd6b751a175f6b9a4a79c9fb6958d3b942438"
+content_hash = "sha256:97d07192fbae2c63f773caee1744cd913bff4007e3d928377943291432fb396b"
 
 [[package]]
 name = "annotated-types"
