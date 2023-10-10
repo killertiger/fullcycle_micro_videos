@@ -69,7 +69,10 @@ WSGI_APPLICATION = 'django_app.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': config_service.database_conn
+    'default': {
+        **config_service.database_conn,
+        'TEST': config_service.database_conn,
+    }
 }
 
 
