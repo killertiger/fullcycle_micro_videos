@@ -28,6 +28,11 @@ Execute specific test with E2E env
 ```
 APP_ENV=e2e pytest src/core/category/tests/e2e/categories/test_e2e_post.py
 ```
+or
+```
+pytest -s --env=e2e src/core/category/tests/e2e/categories/test_e2e_post.py
+```
+
 
 Access test database:
 ```
