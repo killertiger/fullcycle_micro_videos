@@ -6,7 +6,10 @@ RUN apt update && apt install -y \
                     zsh \
                     curl \
                     wget \
-                    fonts-powerline
+                    fonts-powerline \
+                    gcc \
+                    libmariadb-dev \
+                    pkg-config
 
 RUN useradd -ms /bin/bash python
 

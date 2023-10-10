@@ -161,7 +161,9 @@ cython_debug/
 
 .history/
 .docker/zsh/history
+.docker/dbdata
 __coverage/
 envs/.env
 envs/.env.test
 envs/.env.e2e
+docker-compose.override.yaml
