@@ -26,7 +26,7 @@ class TestCategoriesPostE2E:
     def test_invalid_request(self, http_expect: HttpExpect):
         response: Response = self.client_http.post('/categories/', data=http_expect.request.body, format='json')
 
-        assert response.status_code == 400
+        assert response.status_code == 422
         assert response.content == JSONRenderer().render(http_expect.exception.detail)
     
     
