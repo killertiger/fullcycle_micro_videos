@@ -22,7 +22,7 @@ urlpatterns = [
         CategoryResource.as_view(**__init_category_resource()),
     ),
     path(
-        "categories/<uuid:id>/",
+        "categories/<id>/",
         CategoryResource.as_view(**__init_category_resource()),
     ),
 ]
