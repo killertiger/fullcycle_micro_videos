@@ -46,19 +46,24 @@ class CategoryInvalidBodyFixture:
             body_empty=HttpExpect(
                 request=Request(body={}),
                 exception=ValidationError(
-                    {'name': [ErrorDetail('This field is required.', 'required')]}
+                    {'name': [ErrorDetail(
+                        'This field is required.', 'required')]}
                 ),
             ),
             name_none=HttpExpect(
-                request=Request(body={'name': faker.with_invalid_name_none().name}),
+                request=Request(
+                    body={'name': faker.with_invalid_name_none().name}),
                 exception=ValidationError(
-                    {'name': [ErrorDetail('This field may not be null.', 'null')]}
+                    {'name': [ErrorDetail(
+                        'This field may not be null.', 'null')]}
                 ),
             ),
             name_empty=HttpExpect(
-                request=Request(body={'name': faker.with_invalid_name_empty().name}),
+                request=Request(
+                    body={'name': faker.with_invalid_name_empty().name}),
                 exception=ValidationError(
-                    {'name': [ErrorDetail('This field may not be blank.', 'blank')]}
+                    {'name': [ErrorDetail(
+                        'This field may not be blank.', 'blank')]}
                 ),
             ),
             name_not_a_str=HttpExpect(
@@ -142,13 +147,15 @@ class CategoryEntityValidationErrorFixture:
 
         return CategoryEntityValidationErrorFixture(
             name_none=HttpExpect(
-                request=Request(body={'name': faker.with_invalid_name_none().name}),
+                request=Request(
+                    body={'name': faker.with_invalid_name_none().name}),
                 exception=EntityValidationException(
                     {'name': ['This field may not be null.']}
                 ),
             ),
             name_empty=HttpExpect(
-                request=Request(body={'name': faker.with_invalid_name_empty().name}),
+                request=Request(
+                    body={'name': faker.with_invalid_name_empty().name}),
                 exception=EntityValidationException(
                     {'name': ['This field may not be blank.']}
                 ),
@@ -157,10 +164,12 @@ class CategoryEntityValidationErrorFixture:
                 request=Request(
                     body={'name': faker.with_invalid_name_not_string().name}
                 ),
-                exception=EntityValidationException({'name': ['Not a valid string.']}),
+                exception=EntityValidationException(
+                    {'name': ['Not a valid string.']}),
             ),
             name_too_long=HttpExpect(
-                request=Request(body={'name': faker.with_invalid_name_too_long().name}),
+                request=Request(
+                    body={'name': faker.with_invalid_name_too_long().name}),
                 exception=EntityValidationException(
                     {'name': ['Ensure this field has no more than 255 characters.']}
                 ),
@@ -240,7 +249,8 @@ class CreateCategoryAPIFixture:
             pytest.param(fixture.name_empty, id='name_empty'),
             pytest.param(fixture.is_active_none, id='is_active_none'),
             pytest.param(fixture.is_active_empty, id='is_active_empty'),
-            pytest.param(fixture.is_active_not_a_bool, id='is_active_not_a_bool'),
+            pytest.param(fixture.is_active_not_a_bool,
+                         id='is_active_not_a_bool'),
         ]
 
     @staticmethod
@@ -251,10 +261,12 @@ class CreateCategoryAPIFixture:
             pytest.param(fixture.name_empty, id='name_empty'),
             pytest.param(fixture.name_not_a_str, id='name_not_a_str'),
             pytest.param(fixture.name_too_long, id='name_too_long'),
-            pytest.param(fixture.description_not_a_str, id='description_not_a_str'),
+            pytest.param(fixture.description_not_a_str,
+                         id='description_not_a_str'),
             pytest.param(fixture.is_active_none, id='is_active_none'),
             pytest.param(fixture.is_active_empty, id='is_active_empty'),
-            pytest.param(fixture.is_active_not_a_bool, id='is_active_not_a_bool'),
+            pytest.param(fixture.is_active_not_a_bool,
+                         id='is_active_not_a_bool'),
         ]
 
     @staticmethod
@@ -278,7 +290,8 @@ class CreateCategoryAPIFixture:
                     }
                 ),
                 response=Response(
-                    body={'name': faker.name, 'description': None, 'is_active': True}
+                    body={'name': faker.name,
+                          'description': None, 'is_active': True}
                 ),
             ),
             HttpExpect(
@@ -341,7 +354,8 @@ class UpdateCategoryAPIFixture:
             pytest.param(fixture.name_empty, id='name_empty'),
             pytest.param(fixture.is_active_none, id='is_active_none'),
             pytest.param(fixture.is_active_empty, id='is_active_empty'),
-            pytest.param(fixture.is_active_not_a_bool, id='is_active_not_a_bool'),
+            pytest.param(fixture.is_active_not_a_bool,
+                         id='is_active_not_a_bool'),
         ]
 
     @staticmethod
@@ -352,7 +366,8 @@ class UpdateCategoryAPIFixture:
             pytest.param(fixture.name_empty, id='name_empty'),
             pytest.param(fixture.name_not_a_str, id='name_not_a_str'),
             pytest.param(fixture.name_too_long, id='name_too_long'),
-            pytest.param(fixture.description_not_a_str, id='description_not_a_str'),
+            pytest.param(fixture.description_not_a_str,
+                         id='description_not_a_str'),
         ]
 
     @staticmethod
@@ -428,7 +443,7 @@ class SearchExpectation:
 class ListCategoriesApiFixture:
     @staticmethod
     def arrange_incremented_with_created_at():
-        with_created_at_faker = lambda index: datetime.datetime.now(
+        def with_created_at_faker(index): return datetime.datetime.now(
             datetime.timezone.utc
         ) + datetime.timedelta(days=index)
 
@@ -460,10 +475,10 @@ class ListCategoriesApiFixture:
                         categories_named.first,
                     ],
                     meta={
+                        'total': 4,
                         'current_page': 1,
                         'per_page': 15,
                         'last_page': 1,
-                        'total': 4,
                     },
                 ),
                 entities=categories,
@@ -472,7 +487,8 @@ class ListCategoriesApiFixture:
                 send_data={'page': 1, 'per_page': 2},
                 expected=SearchExpectation.Expected(
                     entities=[categories_named.fourth, categories_named.third],
-                    meta={'current_page': 1, 'per_page': 2, 'last_page': 2, 'total': 4},
+                    meta={'total': 4, 'current_page': 1,
+                          'per_page': 2, 'last_page': 2, },
                 ),
                 entities=categories,
             ),
@@ -480,7 +496,8 @@ class ListCategoriesApiFixture:
                 send_data={'page': 2, 'per_page': 2},
                 expected=SearchExpectation.Expected(
                     entities=[categories_named.second, categories_named.first],
-                    meta={'current_page': 2, 'per_page': 2, 'last_page': 2, 'total': 4},
+                    meta={'total': 4, 'current_page': 2,
+                          'per_page': 2, 'last_page': 2, },
                 ),
                 entities=categories,
             ),
@@ -501,7 +518,8 @@ class ListCategoriesApiFixture:
             faker.with_name('b').build(),
             faker.with_name('c').build(),
         ]
-        CategoriesNamed = namedtuple('CategoriesNamed', ['a', 'AAA', 'AaA', 'b', 'c'])
+        CategoriesNamed = namedtuple(
+            'CategoriesNamed', ['a', 'AAA', 'AaA', 'b', 'c'])
         categories_named = CategoriesNamed(
             a=categories[0],
             AAA=categories[1],
@@ -511,33 +529,35 @@ class ListCategoriesApiFixture:
         )
         arrange = [
             SearchExpectation(
-                send_data={'page': 1, 'per_page': 2, 'sort': 'name', 'filter': 'a'},
+                send_data={'page': 1, 'per_page': 2,
+                           'sort': 'name', 'filter': 'a'},
                 expected=SearchExpectation.Expected(
                     entities=[categories_named.AAA, categories_named.AaA],
                     meta={
                         'total': 3,
                         'current_page': 1,
+                        'per_page': 2,
                         'last_page': 2,
-                        'per_page': 2
                     }
                 ),
                 entities=categories,
             ),
             SearchExpectation(
-                send_data={'page': 2, 'per_page': 2, 'sort': 'name', 'filter': 'a'},
+                send_data={'page': 2, 'per_page': 2,
+                           'sort': 'name', 'filter': 'a'},
                 expected=SearchExpectation.Expected(
                     entities=[categories_named.a],
                     meta={
                         'total': 3,
                         'current_page': 2,
+                        'per_page': 2,
                         'last_page': 2,
-                        'per_page': 2
                     }
                 ),
                 entities=categories,
             )
         ]
-        
+
         return [
             pytest.param(item, id=f'send_data={str(item.send_data)}')
             for item in arrange
