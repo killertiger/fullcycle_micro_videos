@@ -45,7 +45,8 @@
         "src",
         "--ignore",
         "__pypackages__",
-        "-s"
+        "-s",
+        "--env=e2e"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true

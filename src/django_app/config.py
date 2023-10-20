@@ -17,6 +17,7 @@ class ConfigService(BaseSettings):
     language_code: str = 'en-us'
     middlewares_additional: List[str]
     secret_key: str
+    test_keep_db: bool = True
 
     
     class Config:
@@ -35,4 +36,3 @@ class ConfigService(BaseSettings):
         return dj_database_url.config(default=values['database_dsn'])
         
 config_service = ConfigService()
-
