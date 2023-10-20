@@ -18,6 +18,7 @@ class ConfigService(BaseSettings):
     middlewares_additional: List[str]
     secret_key: str
     test_keep_db: bool = True
+    test_use_migrations: bool = False
 
     
     class Config:
