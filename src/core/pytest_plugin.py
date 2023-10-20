@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List
 import os
 import pytest
@@ -39,3 +40,42 @@ def pytest_runtest_setup(item: pytest.Item):
     if group_option:
         if group_mark is None or group_option not in group_mark.args:
             pytest.skip(f'test requires group {group_option}')
+
+
+@pytest.fixture(scope='function')
+def enable_migration(django_db_use_migrations) -> bool:
+    return EnableMigration(is_migrations_enabled=django_db_use_migrations)
+
+MigrationCommandBackup = None
+
+def pytest_configure(config: pytest.Config):
+    from django.core.management.commands import migrate
+    global MigrationCommandBackup
+    MigrationCommandBackup = migrate.Command
+    
+@dataclass
+class EnableMigration:
+    
+    is_migrations_enabled: bool
+    
+    def run(self):
+        return EnableMigration(is_migrations_enabled=self.is_migrations_enabled)
+    
+    def __enter__(self):
+        if self.is_migrations_enabled:
+            return
+        
+        from django.core.management.commands import migrate
+        from django.conf import settings
+        
+        settings.MIGRATION_MODULES = {}
+        migrate.Command = MigrationCommandBackup
+        
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.is_migrations_enabled:
+            return
+        
+        from pytest_django.fixtures import _disable_migrations
+        _disable_migrations()

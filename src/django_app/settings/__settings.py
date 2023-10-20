@@ -72,6 +72,10 @@ DATABASES = {
     'default': {
         **config_service.database_conn,
         'TEST': config_service.database_conn,
+    },
+    'test_for_migrations': {
+        **config_service.database_conn,
+        'NAME': ':memory:' if config_service.database_conn['ENGINE'] == 'django.db.backends.sqlite3' else 'test_with_migrations',
     }
 }
 
