@@ -14,7 +14,7 @@ from core.category.tests.helpers import init_category_resource_all_none
 from core.category.tests.fixture.categories_api_fixture import CategoryAPIFixture, ListCategoriesApiFixture, SearchExpectation
 from rest_framework.test import APIClient
 
-
+@pytest.mark.group('e2e')
 @pytest.mark.django_db
 class TestCategoriesGetE2E:
 

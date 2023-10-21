@@ -36,10 +36,10 @@ class TestIntMigrations:
             assert output.getvalue().count('category') == 2
     
     def delete_all_tables_of_sqlite(self, connection):
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             cursor.execute('PRAGMA foreign_keys = OFF;')
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence;'")
-            tables = cursor.fetch_all()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence';")
+            tables = cursor.fetchall()
             for table in tables:
                 cursor.execute(f'DROP TABLE {table[0]};')
             cursor.execute('PRAGMA foreign_keys = ON;')

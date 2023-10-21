@@ -40,4 +40,5 @@ test = "pytest --ignore __pypackages__"
 test_cov = "pdm run test --cov ./src --cov-fail-under 80"
 test_cov_html = "pdm run test_cov --cov-report html:./__coverage"
 test_e2e = "pdm run test --ignore __pypackages__ --group e2e"
+test_e2e_cov_html = "pdm run test_cov_html --group e2e"
 
