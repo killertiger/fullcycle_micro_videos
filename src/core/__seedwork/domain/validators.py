@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Generic, TypeVar
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from rest_framework.serializers import Serializer
-from rest_framework.fields import CharField, BooleanField
+from rest_framework.fields import CharField, BooleanField, Field, empty
 from django.conf import settings
 
 from .exceptions import ValidationException
@@ -92,3 +92,27 @@ class StrictBooleanField(BooleanField):
         except TypeError:
             pass
         self.fail('invalid', input=data)
+
+class ObjectField(Field):
+    default_error_message = {
+        # 'invalid': _('Not a instance of {instance_name}'),
+        'invalid': 'Not a instance of {instance_name}', # TODO : Fix this
+    }
+    
+    def __init__(self, instance_class, **kwargs):
+        self.instance_class = instance_class
+        if self.instance_class is None:
+            raise TypeError('The `instance_class` argument is required.')
+        super().__init__(**kwargs)
+        
+    def run_validation(self, data=empty):
+        super().run_validation(data)
+        if self.required and not self.allow_null and not isinstance(data, self.instance_class):
+            self.fail('invalid', instance_name=self.instance_class.__name__)
+        return data
+    
+    def to_internal_value(self, data):
+        return data
+    
+    def to_representation(self, value):
+        return value

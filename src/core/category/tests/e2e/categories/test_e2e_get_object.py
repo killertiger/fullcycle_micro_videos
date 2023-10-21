@@ -1,5 +1,5 @@
 from core.__seedwork.domain.value_objects import UniqueEntityId
-from core.category.infra.django_app.api import CategoryResource
+from core.category.infra.category_django_app.api import CategoryResource
 import pytest
 from django_app import container
 from rest_framework.test import APIClient

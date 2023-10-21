@@ -3,8 +3,8 @@ from django_app import container
 from rest_framework.exceptions import ValidationError, ErrorDetail
 from core.category.domain.entities import Category
 from core.__seedwork.domain.exceptions import NotFoundException
-from core.category.infra.django_app.api import CategoryResource
-from core.category.infra.django_app.repositories import CategoryRepository
+from core.category.infra.category_django_app.api import CategoryResource
+from core.category.infra.category_django_app.repositories import CategoryRepository
 from core.category.tests.helpers import init_category_resource_all_none
 from core.category.tests.fixture.categories_api_fixture import CategoryAPIFixture
 

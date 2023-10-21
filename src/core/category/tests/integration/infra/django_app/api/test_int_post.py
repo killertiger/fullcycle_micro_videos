@@ -1,11 +1,11 @@
-from core.category.infra.django_app.serializer import CategorySerializer
+from core.category.infra.category_django_app.serializer import CategorySerializer
 import pytest
 from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 from django_app import container
 from unittest.mock import patch, PropertyMock
 from core.category.domain.repositories import CategoryRepository
-from core.category.infra.django_app.api import CategoryResource
+from core.category.infra.category_django_app.api import CategoryResource
 from core.category.tests.fixture.categories_api_fixture import (
     CreateCategoryAPIFixture,
     HttpExpect,

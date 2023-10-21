@@ -5,10 +5,10 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from core.category.domain.entities import Category
-from core.category.infra.django_app.serializer import CategorySerializer
+from core.category.infra.category_django_app.serializer import CategorySerializer
 from core.__seedwork.domain.exceptions import NotFoundException
 from core.category.domain.repositories import CategoryRepository
-from core.category.infra.django_app.api import CategoryResource
+from core.category.infra.category_django_app.api import CategoryResource
 from core.category.tests.fixture.categories_api_fixture import (
     UpdateCategoryAPIFixture,
     HttpExpect,

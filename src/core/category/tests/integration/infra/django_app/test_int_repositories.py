@@ -6,9 +6,9 @@ import pytest
 from model_bakery import baker
 from core.__seedwork.domain.exceptions import NotFoundException
 from core.__seedwork.domain.value_objects import UniqueEntityId
-from core.category.infra.django_app.mapper import CategoryModelMapper
-from core.category.infra.django_app.repositories import CategoryDjangoRepository
-from core.category.infra.django_app.models import CategoryModel
+from core.category.infra.category_django_app.mapper import CategoryModelMapper
+from core.category.infra.category_django_app.repositories import CategoryDjangoRepository
+from core.category.infra.category_django_app.models import CategoryModel
 from core.category.domain.entities import Category
 from core.category.domain.repositories import CategoryRepository
 

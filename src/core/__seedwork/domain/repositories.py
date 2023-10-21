@@ -1,7 +1,8 @@
 import math
+from enum import Enum
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Generic, TypeVar, List, Optional, Any
+from dataclasses import Field, dataclass, field, InitVar
+from typing import Generic, TypeVar, List, Optional, Any, Literal
 from core.__seedwork.domain.value_objects import UniqueEntityId
 from core.__seedwork.domain.entities import Entity
 from core.__seedwork.domain.exceptions import NotFoundException
@@ -51,30 +52,40 @@ class SearchableRepositoryInterface(Generic[ET, Input, Output], RepositoryInterf
 
 Filter = TypeVar('Filter', str, Any)
 
+class SortDirection(Enum):
+    ASC = 'asc'
+    DESC = 'desc'
+    
+    def equals(self, value):
+        return value == self.value
+    
+SortDirectionValues = Literal['asc', 'desc']
 
-@dataclass(slots=True, kw_only=True)
+
+@dataclass(slots=True, init=True, kw_only=True)
 class SearchParams(Generic[Filter]):
     page: Optional[int] = 1
     per_page: Optional[int] = 15
     sort: Optional[str] = None
-    sort_dir: Optional[str] = None
+    init_sort_dir: InitVar[SortDirectionValues | SortDirection | None] = None
+    sort_dir: Optional[SortDirection] = field(init=False, default=None)
     filter: Optional[Filter] = None
 
-    def __post_init__(self):
+    def __post_init__(self, init_sort_dir: SortDirectionValues | SortDirection | None):
         self._normalize_page()
         self._normalize_per_page()
         self._normalize_sort()
-        self._normalize_sort_dir()
+        self._normalize_sort_dir(init_sort_dir)
         self._normalize_filter()
 
     def _normalize_page(self):
-        page = self._convert_to_int(self.page)
+        page = self._int_or_none(self.page)
         if page <= 0:
             page = self._get_dataclass_field('page').default
         self.page = page
 
     def _normalize_per_page(self):
-        per_page = self._convert_to_int(self.per_page)
+        per_page = self._int_or_none(self.per_page)
         if per_page < 1:
             per_page = self._get_dataclass_field('per_page').default
         self.per_page = per_page
@@ -83,13 +94,20 @@ class SearchParams(Generic[Filter]):
         self.sort = None if self.sort == "" or self.sort is None else str(
             self.sort)
 
-    def _normalize_sort_dir(self):
+    def _normalize_sort_dir(self, init_sort_dir: SortDirectionValues | SortDirection | None):
         if not self.sort:
             self.sort_dir = None
             return
-
-        sort_dir = str(self.sort_dir).lower()
-        self.sort_dir = 'asc' if sort_dir not in ['asc', 'desc'] else sort_dir
+        
+        if isinstance(init_sort_dir, SortDirection):
+            self.sort_dir = init_sort_dir
+            return
+        
+        init_sort_dir = str(init_sort_dir).lower()
+        if init_sort_dir == 'desc':
+            self.sort = SortDirection.DESC
+        else:
+            self.sort = SortDirection.ASC
 
     def _normalize_filter(self):
         self.filter = (
@@ -105,7 +123,18 @@ class SearchParams(Generic[Filter]):
 
     def _get_dataclass_field(self, field_name):
         return SearchParams.__dataclass_fields__[field_name]  # pylint: disable=no-member
+    
+    @classmethod
+    def get_field(cls, entity_field: str) -> Field:
+        return cls.__dataclass_fields__[entity_field]
 
+def _int_or_none(value: Any, default=0) -> int:
+    try:
+        return int(value)
+    except ValueError:
+        return default
+    except TypeError:
+        return default
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class SearchResult(Generic[ET, Filter]):  # pylint: disable=too-many-instance-attributes
@@ -196,9 +225,9 @@ class InMemorySearchableRepository(
     def _apply_filter(self, items: List[ET], filter_param: Filter | None) -> List[ET]:
         raise NotImplementedError()
 
-    def _apply_sort(self, items: List[ET], sort: str | None, sort_dir: str | None) -> List[ET]:
+    def _apply_sort(self, items: List[ET], sort: str | None, sort_dir: SortDirection | None) -> List[ET]:
         if sort and sort in self.sortable_fields:
-            is_reverse = sort_dir == 'desc'
+            is_reverse = sort_dir == SortDirection.DESC
             return sorted(items, key=lambda item: getattr(item, sort), reverse=is_reverse)
         return items
 

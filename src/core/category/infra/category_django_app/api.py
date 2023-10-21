@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework import status as http_status
 from core.__seedwork.infra.django_app.serializers import UUIDSerializer
 from core.category.application.dto import CategoryOutput
-from core.category.infra.django_app.serializer import (
+from core.category.infra.category_django_app.serializer import (
     CategorySerializer,
     CategoryCollectionSerializer,
 )

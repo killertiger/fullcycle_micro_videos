@@ -6,8 +6,8 @@ from rest_framework.renderers import JSONRenderer
 
 
 from core.category.domain.repositories import CategoryRepository
-from core.category.infra.django_app.api import CategoryResource
-from core.category.infra.django_app.serializer import CategorySerializer
+from core.category.infra.category_django_app.api import CategoryResource
+from core.category.infra.category_django_app.serializer import CategorySerializer
 from core.category.tests.fixture.categories_api_fixture import CreateCategoryAPIFixture, HttpExpect
 from django_app import container
 

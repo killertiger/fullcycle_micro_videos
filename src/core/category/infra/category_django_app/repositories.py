@@ -2,13 +2,14 @@ from typing import List, TYPE_CHECKING, Type
 from django.core import exceptions as django_exceptions
 from django.core.paginator import Paginator
 from core.__seedwork.domain.exceptions import NotFoundException
+from core.__seedwork.domain.repositories import SortDirection
 from core.__seedwork.domain.value_objects import UniqueEntityId
 from core.category.domain.entities import Category
 from core.category.domain.repositories import CategoryRepository
-from core.category.infra.django_app.mapper import CategoryModelMapper
+from core.category.infra.category_django_app.mapper import CategoryModelMapper
 
 if TYPE_CHECKING:
-    from core.category.infra.django_app.models import CategoryModel
+    from core.category.infra.category_django_app.models import CategoryModel
 
 
 class CategoryDjangoRepository(CategoryRepository):
@@ -16,7 +17,7 @@ class CategoryDjangoRepository(CategoryRepository):
     model: Type['CategoryModel']
 
     def __init__(self) -> None:
-        from core.category.infra.django_app.models import CategoryModel
+        from core.category.infra.category_django_app.models import CategoryModel
         self.model = CategoryModel
 
     def insert(self, entity: Category) -> None:
@@ -70,7 +71,7 @@ class CategoryDjangoRepository(CategoryRepository):
         if input_params.sort and input_params.sort in self.sortable_fields:
             query = query.order_by(
                 input_params.sort
-                if input_params.sort_dir == 'asc'
+                if input_params.sort_dir == SortDirection.ASC
                 else f'-{input_params.sort}'
             )
         else:

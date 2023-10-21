@@ -2,7 +2,7 @@ import pytest
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError, ErrorDetail
 from core.category.application.dto import CategoryOutput
-from core.category.infra.django_app.api import CategoryResource
+from core.category.infra.category_django_app.api import CategoryResource
 from core.category.tests.helpers import init_category_resource_all_none
 from core.__seedwork.infra.django_app.serializers import ISO_8601
 

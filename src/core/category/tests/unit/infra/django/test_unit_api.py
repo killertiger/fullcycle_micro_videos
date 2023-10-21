@@ -8,7 +8,7 @@ from rest_framework.request import Request
 from core.__seedwork.infra.django_app.serializers import UUIDSerializer
 from core.__seedwork.infra.testing.helpers import make_request
 from core.category.application.dto import CategoryOutput
-from core.category.infra.django_app.serializer import CategorySerializer
+from core.category.infra.category_django_app.serializer import CategorySerializer
 from core.category.application.use_cases import (
     CreateCategoryUseCase,
     ListCategoriesUseCase,
@@ -16,7 +16,7 @@ from core.category.application.use_cases import (
     UpdateCategoryUseCase,
     DeleteCategoryUseCase,
 )
-from core.category.infra.django_app.api import CategoryResource
+from core.category.infra.category_django_app.api import CategoryResource
 from core.category.tests.helpers import init_category_resource_all_none
 
 

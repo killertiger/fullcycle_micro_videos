@@ -1,8 +1,8 @@
 import unittest
 from core.category.domain.entities import Category
 from django.utils import timezone
-from core.category.infra.django_app.mapper import CategoryModelMapper
-from core.category.infra.django_app.models import CategoryModel
+from core.category.infra.category_django_app.mapper import CategoryModelMapper
+from core.category.infra.category_django_app.models import CategoryModel
 
 
 class TestCategoryModelMapper(unittest.TestCase):

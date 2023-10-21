@@ -4,7 +4,7 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from core.category.domain.entities import Category
 from core.__seedwork.domain.exceptions import NotFoundException
 from core.category.domain.repositories import CategoryRepository
-from core.category.infra.django_app.api import CategoryResource
+from core.category.infra.category_django_app.api import CategoryResource
 from core.category.tests.helpers import init_category_resource_all_none
 from core.__seedwork.infra.testing.helpers import make_request
 

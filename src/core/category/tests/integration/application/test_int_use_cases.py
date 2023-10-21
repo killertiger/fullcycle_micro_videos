@@ -11,7 +11,7 @@ from core.category.application.use_cases import (
     UpdateCategoryUseCase,
     DeleteCategoryUseCase,
 )
-from core.category.infra.django_app.repositories import CategoryDjangoRepository
+from core.category.infra.category_django_app.repositories import CategoryDjangoRepository
 
 
 @pytest.mark.django_db

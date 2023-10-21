@@ -6,7 +6,7 @@ from core.__seedwork.domain.value_objects import UniqueEntityId
 from core.category.domain.entities import Category
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from core.category.infra.django_app.models import CategoryModel
+    from core.category.infra.category_django_app.models import CategoryModel
 
 
 class CategoryModelMapper:
@@ -25,5 +25,5 @@ class CategoryModelMapper:
 
     @staticmethod
     def to_model(entity: Category) -> 'CategoryModel':
-        from core.category.infra.django_app.models import CategoryModel
+        from core.category.infra.category_django_app.models import CategoryModel
         return CategoryModel(**entity.to_dict())

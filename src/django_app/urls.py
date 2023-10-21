@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django_app import container
 
-from core.category.infra.django_app.api import CategoryResource
+from core.category.infra.category_django_app.api import CategoryResource
 
 
 def __init_category_resource():

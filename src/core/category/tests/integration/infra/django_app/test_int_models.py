@@ -3,7 +3,7 @@ import unittest
 from django.utils import timezone
 from django.db import models
 import pytest
-from core.category.infra.django_app.models import CategoryModel
+from core.category.infra.category_django_app.models import CategoryModel
 
 
 @pytest.mark.django_db()

@@ -1,5 +1,5 @@
 from dependency_injector import containers, providers
-from core.category.infra.django_app.repositories import CategoryDjangoRepository
+from core.category.infra.category_django_app.repositories import CategoryDjangoRepository
 from core.category.application.use_cases import (
     CreateCategoryUseCase,
     ListCategoriesUseCase,
