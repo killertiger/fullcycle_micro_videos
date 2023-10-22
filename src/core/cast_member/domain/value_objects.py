@@ -1,6 +1,7 @@
 from typing import Union, Literal
 from enum import Enum
 from dataclasses import dataclass, field, InitVar
+from core.__seedwork.domain.utils import Either
 from core.__seedwork.domain.value_objects import ValueObject
 from .exceptions import InvalidCastMemberTypeException
 
