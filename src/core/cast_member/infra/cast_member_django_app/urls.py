@@ -1,4 +1,6 @@
 from django.urls import path
+
+from django_app import container
 from .api import CastMemberResource
 
 
