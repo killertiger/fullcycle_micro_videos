@@ -13,27 +13,37 @@ class CategoryOutput:
     is_active: bool
     created_at: datetime
 
-
-Output = TypeVar('Output', bound=CategoryOutput)
-
-
-@dataclass(slots=True, frozen=True)
-class CategoryOutputMapper:
-    output_child: Optional[Output] = CategoryOutput
-
-    @staticmethod
-    def from_child(output_child: Output):
-        return CategoryOutputMapper(output_child)
-
-    @staticmethod
-    def without_child():
-        return CategoryOutputMapper()
-
-    def to_output(self, category: Category) -> CategoryOutput:
-        return self.output_child(
+    @classmethod
+    def from_entity(cls, category: Category):
+        return cls(
             id=category.id,
             name=category.name,
             description=category.description,
             is_active=category.is_active,
             created_at=category.created_at
         )
+
+
+Output = TypeVar('Output', bound=CategoryOutput)
+
+
+# @dataclass(slots=True, frozen=True)
+# class CategoryOutputMapper:
+#     output_child: Optional[Output] = CategoryOutput
+
+#     @staticmethod
+#     def from_child(output_child: Output):
+#         return CategoryOutputMapper(output_child)
+
+#     @staticmethod
+#     def without_child():
+#         return CategoryOutputMapper()
+
+#     def to_output(self, category: Category) -> CategoryOutput:
+#         return self.output_child(
+#             id=category.id,
+#             name=category.name,
+#             description=category.description,
+#             is_active=category.is_active,
+#             created_at=category.created_at
+#         )
