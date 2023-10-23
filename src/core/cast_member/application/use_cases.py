@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from core.__seedwork.application.dto import PaginationOutput, SearchInput
 from core.__seedwork.application.use_cases import UseCase
 from core.__seedwork.domain.exceptions import EntityValidationException
 from core.cast_member.application.dto import CastMemberOutput
@@ -106,3 +107,30 @@ class DeleteCastMemberUseCase(UseCase):
     @dataclass(slots=True, frozen=True)
     class Input:
         id: str
+        
+@dataclass(frozen=True, slots=True)
+class ListCastMemberUseCase(UseCase):
+    
+    cast_member_repo: CastMemberRepository
+    
+    def execute(self, request: 'Input') -> 'Output':
+        search_params = CastMemberRepository.SearchParams.create(**request.to_repository_input())
+        result = self.cast_member_repo.search(search_params)
+        return self.__to_output(result)
+    
+    def __to_output(self, result: CastMemberRepository.SearchResult) -> 'Output':
+        items = (
+            map(CastMemberOutput.from_entity, result.items)
+        )
+        return self.Output.from_search_result(
+            items,
+            result
+        )
+    
+    @dataclass(frozen=True, slots=True)
+    class Input(SearchInput[CastMemberRepository.Filter]):
+        pass
+    
+    @dataclass(frozen=True, slots=True)
+    class Output(PaginationOutput[CastMemberOutput]):
+        pass
