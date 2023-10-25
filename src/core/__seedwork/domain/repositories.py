@@ -105,9 +105,9 @@ class SearchParams(Generic[Filter]):
         
         init_sort_dir = str(init_sort_dir).lower()
         if init_sort_dir == 'desc':
-            self.sort = SortDirection.DESC
+            self.sort_dir = SortDirection.DESC
         else:
-            self.sort = SortDirection.ASC
+            self.sort_dir = SortDirection.ASC
 
     def _normalize_filter(self):
         self.filter = (
@@ -128,13 +128,13 @@ class SearchParams(Generic[Filter]):
     def get_field(cls, entity_field: str) -> Field:
         return cls.__dataclass_fields__[entity_field]
 
-def _int_or_none(value: Any, default=0) -> int:
-    try:
-        return int(value)
-    except ValueError:
-        return default
-    except TypeError:
-        return default
+    def _int_or_none(self, value: Any, default=0) -> int:
+        try:
+            return int(value)
+        except ValueError:
+            return default
+        except TypeError:
+            return default
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class SearchResult(Generic[ET, Filter]):  # pylint: disable=too-many-instance-attributes

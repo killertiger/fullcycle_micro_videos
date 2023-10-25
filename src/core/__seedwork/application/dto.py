@@ -43,23 +43,24 @@ class PaginationOutput(Generic[PaginationOutputItem]):
             last_page=result.last_page
         )
 
+# TODO: Remove PaginationOutputMapper
+Output = TypeVar('Output', bound=PaginationOutput)
+Item = TypeVar('Item', bound=PaginationOutput)
 
-# Output = TypeVar('Output', bound=PaginationOutput)
-
-
+# TODO: Remove PaginationOutputMapper
 # @dataclass(slots=True, frozen=True)
-# class PaginationOutputMapper:
-#     output_child: Output
+class PaginationOutputMapper:
+    output_child: Output
 
-#     @staticmethod
-#     def from_child(output_child: Output):
-#         return PaginationOutputMapper(output_child)
+    @staticmethod
+    def from_child(output_child: Output):
+        return PaginationOutputMapper(output_child)
 
-#     def to_output(self, items: List[Item], result: SearchResult) -> PaginationOutput[Item]:
-#         return self.output_child(
-#             items=items,
-#             total=result.total,
-#             current_page=result.current_page,
-#             per_page=result.per_page,
-#             last_page=result.last_page
-#         )
+    def to_output(self, items: List[Item], result: SearchResult) -> PaginationOutput[Item]:
+        return self.output_child(
+            items=items,
+            total=result.total,
+            current_page=result.current_page,
+            per_page=result.per_page,
+            last_page=result.last_page
+        )

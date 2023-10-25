@@ -1,6 +1,6 @@
 import unittest
-from dataclasses import dataclass
-from typing import Optional, List
+from dataclasses import InitVar, dataclass
+from typing import Literal, Optional, List, Union
 from core.__seedwork.domain.repositories import (
     ET,
     Filter,
@@ -9,7 +9,9 @@ from core.__seedwork.domain.repositories import (
     RepositoryInterface,
     SearchParams,
     SearchableRepositoryInterface,
-    SearchResult
+    SearchResult,
+    SortDirection,
+    SortDirectionValues,
 )
 from core.__seedwork.domain.entities import Entity
 from core.__seedwork.domain.exceptions import NotFoundException
@@ -150,13 +152,17 @@ class TestSearchableRepositoryInterface(unittest.TestCase):
 
 
 class TestSearchParams(unittest.TestCase):
+    maxDiff = None
+
+#TODO: TEST TO BE FIXED    
     def test_props_annotations(self):
         self.assertEqual(SearchParams.__annotations__,
                          {
                              'page': Optional[int],
                              'per_page': Optional[int],
                              'sort': Optional[str],
-                             'sort_dir': Optional[str],
+                             'init_sort_dir': InitVar[SortDirectionValues | SortDirection | None],
+                             'sort_dir': Optional[SortDirection],
                              'filter': Optional[Filter]
                          })
 
@@ -239,18 +245,18 @@ class TestSearchParams(unittest.TestCase):
         self.assertIsNone(params.sort_dir)
 
         arrange = [
-            {'sort_dir': None, 'expected': 'asc'},
-            {'sort_dir': "", 'expected': 'asc'},
-            {'sort_dir': "fake", 'expected': 'asc'},
-            {'sort_dir': 0, 'expected': 'asc'},
-            {'sort_dir': 'asc', 'expected': 'asc'},
-            {'sort_dir': 'ASC', 'expected': 'asc'},
-            {'sort_dir': 'desc', 'expected': 'desc'},
-            {'sort_dir': 'DESC', 'expected': 'desc'},
+            {'sort_dir': None, 'expected': SortDirection.ASC},
+            {'sort_dir': "", 'expected': SortDirection.ASC},
+            {'sort_dir': "fake", 'expected': SortDirection.ASC},
+            {'sort_dir': 0, 'expected': SortDirection.ASC},
+            {'sort_dir': 'asc', 'expected': SortDirection.ASC},
+            {'sort_dir': 'ASC', 'expected': SortDirection.ASC},
+            {'sort_dir': 'desc', 'expected': SortDirection.DESC},
+            {'sort_dir': 'DESC', 'expected': SortDirection.DESC},
         ]
 
         for i in arrange:
-            params = SearchParams(sort='name', sort_dir=i['sort_dir'])
+            params = SearchParams(sort='name', init_sort_dir=i['sort_dir'])
             self.assertEqual(
                 params.sort_dir, i['expected'], f'sort_dir input: {i["sort_dir"]}')
 
@@ -403,25 +409,25 @@ class TestInMemorySearchableRepository(unittest.TestCase):
         ]
 
         result = self.repo._apply_sort(  # pylint: disable=protected-access
-            items, 'price', 'asc')
+            items, 'price', SortDirection.ASC)
         self.assertEqual(items, result)
 
         result = self.repo._apply_sort(  # pylint: disable=protected-access
-            items, 'name', 'asc')
+            items, 'name', SortDirection.ASC)
         self.assertEqual([items[1], items[0], items[2]], result)
 
         result = self.repo._apply_sort(  # pylint: disable=protected-access
-            items, 'name', 'desc')
+            items, 'name', SortDirection.DESC)
         self.assertEqual([items[2], items[0], items[1]], result)
 
         self.repo.sortable_fields.append('price')
         result = self.repo._apply_sort(  # pylint: disable=protected-access
-            items, 'price', 'asc')
+            items, 'price', SortDirection.ASC)
         self.assertEqual([items[2], items[1], items[0]], result)
 
         self.repo.sortable_fields.append('price')
         result = self.repo._apply_sort(  # pylint: disable=protected-access
-            items, 'price', 'desc')
+            items, 'price', SortDirection.DESC)
         self.assertEqual([items[0], items[1], items[2]], result)
 
     def test__apply_paginate(self):
@@ -532,7 +538,7 @@ class TestInMemorySearchableRepository(unittest.TestCase):
                     current_page=1,
                     per_page=2,
                     sort='name',
-                    sort_dir='asc',
+                    sort_dir=SortDirection.ASC,
                     filter=None
                 )
             },
@@ -544,7 +550,7 @@ class TestInMemorySearchableRepository(unittest.TestCase):
                     current_page=2,
                     per_page=2,
                     sort='name',
-                    sort_dir='asc',
+                    sort_dir=SortDirection.ASC,
                     filter=None
                 )
             },
@@ -556,7 +562,7 @@ class TestInMemorySearchableRepository(unittest.TestCase):
                     current_page=3,
                     per_page=2,
                     sort='name',
-                    sort_dir='asc',
+                    sort_dir=SortDirection.ASC,
                     filter=None
                 )
             },
@@ -570,38 +576,38 @@ class TestInMemorySearchableRepository(unittest.TestCase):
 
         arrange_by_desc = [
             {
-                'input': SearchParams(page=1, per_page=2, sort='name', sort_dir='desc'),
+                'input': SearchParams(page=1, per_page=2, sort='name', init_sort_dir=SortDirection.DESC),
                 'output': SearchResult(
                     items=[items[3], items[2]],
                     total=5,
                     current_page=1,
                     per_page=2,
                     sort='name',
-                    sort_dir='desc',
+                    sort_dir=SortDirection.DESC,
                     filter=None
                 )
             },
             {
-                'input': SearchParams(page=2, per_page=2, sort='name', sort_dir='desc'),
+                'input': SearchParams(page=2, per_page=2, sort='name', init_sort_dir=SortDirection.DESC),
                 'output': SearchResult(
                     items=[items[4], items[0]],
                     total=5,
                     current_page=2,
                     per_page=2,
                     sort='name',
-                    sort_dir='desc',
+                    sort_dir=SortDirection.DESC,
                     filter=None
                 )
             },
             {
-                'input': SearchParams(page=3, per_page=2, sort='name', sort_dir='desc'),
+                'input': SearchParams(page=3, per_page=2, sort='name', init_sort_dir=SortDirection.DESC),
                 'output': SearchResult(
                     items=[items[1]],
                     total=5,
                     current_page=3,
                     per_page=2,
                     sort='name',
-                    sort_dir='desc',
+                    sort_dir=SortDirection.DESC,
                     filter=None
                 )
             },
@@ -624,7 +630,7 @@ class TestInMemorySearchableRepository(unittest.TestCase):
         self.repo.items = items
 
         result = self.repo.search(SearchParams(
-            page=1, per_page=2, sort='name', sort_dir='asc', filter='TEST'
+            page=1, per_page=2, sort='name', init_sort_dir=SortDirection.ASC, filter='TEST'
         ))
         self.assertEqual(result, SearchResult(
             items=[items[2], items[4]],
@@ -632,12 +638,12 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             current_page=1,
             per_page=2,
             sort='name',
-            sort_dir='asc',
+            sort_dir=SortDirection.ASC,
             filter='TEST'
         ))
 
         result = self.repo.search(SearchParams(
-            page=2, per_page=2, sort='name', sort_dir='asc', filter='TEST'
+            page=2, per_page=2, sort='name', init_sort_dir=SortDirection.ASC, filter='TEST'
         ))
         self.assertEqual(result, SearchResult(
             items=[items[0]],
@@ -645,6 +651,6 @@ class TestInMemorySearchableRepository(unittest.TestCase):
             current_page=2,
             per_page=2,
             sort='name',
-            sort_dir='asc',
+            sort_dir=SortDirection.ASC,
             filter='TEST'
         ))

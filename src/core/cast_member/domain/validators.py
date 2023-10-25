@@ -1,7 +1,7 @@
 from typing import Dict
 from rest_framework import serializers
 from core.__seedwork.domain.validators import ObjectField, StrictCharField, DRFValidator
-from .entities import CastMemberType
+from .value_objects import CastMemberType
 
 
 

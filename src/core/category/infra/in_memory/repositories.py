@@ -1,5 +1,5 @@
 from typing import List, Any
-from core.__seedwork.domain.repositories import InMemorySearchableRepository
+from core.__seedwork.domain.repositories import InMemorySearchableRepository, SortDirection
 from core.category.domain.entities import Category
 
 from core.category.domain.repositories import CategoryRepository
@@ -17,6 +17,6 @@ class CategoryInMemoryRepository(CategoryRepository, InMemorySearchableRepositor
     def _apply_sort(self, items: List, sort: str | None, sort_dir: str | None) -> List:
         if not sort:
             sort = 'created_at'
-            sort_dir = 'desc'
+            sort_dir = SortDirection.DESC
 
         return super()._apply_sort(items, sort, sort_dir)

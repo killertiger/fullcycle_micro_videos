@@ -1,4 +1,3 @@
-from itertools import count
 from typing import TYPE_CHECKING, List, Type
 from core.__seedwork.domain.exceptions import NotFoundException
 from core.__seedwork.domain.repositories import SortDirection
@@ -74,7 +73,7 @@ class CastMemberDjangoRepository(CastMemberRepository):
         page_obj = paginator.page(input_params.page)
         
         return CastMemberRepository.SearchResult(
-            items=[CastMemberModelMapper.to_entity(model) for model in page_obj.object_list]
+            items=[CastMemberModelMapper.to_entity(model) for model in page_obj.object_list],
             total=paginator.count,
             current_page=input_params.page,
             per_page=input_params.per_page,
