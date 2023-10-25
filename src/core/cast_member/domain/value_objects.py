@@ -12,8 +12,8 @@ class CastMemberType(ValueObject):
     init_value: InitVar[Union['Type', str]]
     
     class Type(Enum):
-        DIRECTOR = 1,
-        ACTOR = 1
+        DIRECTOR = 1
+        ACTOR = 2
         
     TypeValues = Literal[1, 2]
     

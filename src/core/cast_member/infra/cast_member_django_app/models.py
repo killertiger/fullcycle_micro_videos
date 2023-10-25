@@ -7,7 +7,7 @@ class CastMemberModel(models.Model):
     DIRECTOR = CastMemberType.Type.DIRECTOR.value
     ACTOR = CastMemberType.Type.ACTOR.value
     
-    TYPE_CHOICES = [
+    TYPES_CHOICES = [
         (DIRECTOR, 'Diretor'),
         (ACTOR, 'Ator')
     ]
@@ -15,7 +15,7 @@ class CastMemberModel(models.Model):
     id = models.UUIDField(primary_key=True, editable=True)
     name = models.CharField(max_length=255)
     cast_member_type = models.PositiveSmallIntegerField(
-        choices=TYPE_CHOICES
+        choices=TYPES_CHOICES
     )
     created_at = models.DateTimeField()
     
